@@ -178,7 +178,16 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
         onUpdate(characters.map(char =>
           char.id === id ? {
             ...char,
-            consistency: { ...character.consistency_tr }
+            consistency: {
+              age: character.consistency_tr!.age,
+              gender: character.consistency_tr!.gender,
+              build: character.consistency_tr!.build,
+              hair: character.consistency_tr!.hair,
+              eyes: character.consistency_tr!.eyes,
+              outfit: character.consistency_tr!.outfit,
+              equipment: character.consistency_tr!.equipment,
+              features: character.consistency_tr!.features
+            }
           } : char
         ))
         setIsKorean(prev => ({ ...prev, [id]: false }))

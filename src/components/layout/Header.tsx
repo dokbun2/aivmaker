@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Film, Menu, Upload, FileText, X } from 'lucide-react'
+import { Menu, Upload, FileText, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface Scene {

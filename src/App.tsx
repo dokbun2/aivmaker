@@ -81,8 +81,8 @@ interface ProjectData {
   project: {
     title: string
     style: string
-    aspectRatio: string | number
-    totalDuration: string | number
+    aspectRatio: string
+    totalDuration: string
     description?: string
     createdAt?: string
   }
