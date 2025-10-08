@@ -98,6 +98,7 @@ function App() {
   const [showNanoStudio, setShowNanoStudio] = useState(false)
   const [showStart, setShowStart] = useState(true)
   const [showVisualConcept, setShowVisualConcept] = useState(false)
+  const [showFrameExtractor, setShowFrameExtractor] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 로컬 스토리지에서 프로젝트 로드
@@ -139,6 +140,7 @@ function App() {
           setShowStart(false)
           setShowNanoStudio(false)
           setShowVisualConcept(false)
+          setShowFrameExtractor(false)
         } catch (error) {
           alert('JSON 파일 파싱 오류: ' + (error as Error).message)
         }
@@ -260,6 +262,8 @@ function App() {
         showStart={showStart}
         onVisualConceptToggle={() => setShowVisualConcept(!showVisualConcept)}
         showVisualConcept={showVisualConcept}
+        onFrameExtractorToggle={() => setShowFrameExtractor(!showFrameExtractor)}
+        showFrameExtractor={showFrameExtractor}
       />
 
       {/* Main Content */}
@@ -295,6 +299,15 @@ function App() {
               src="https://nano-studio-252213558759.us-west1.run.app"
               className="w-full h-full"
               title="Nano Studio"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            />
+          </div>
+        ) : showFrameExtractor ? (
+          <div className="fixed inset-0 top-16 lg:left-72">
+            <iframe
+              src="https://frameex.netlify.app/"
+              className="w-full h-full border-0"
+              title="Frame Extractor"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             />
           </div>

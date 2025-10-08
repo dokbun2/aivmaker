@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Film, Download, X, Sparkles, Home, Palette } from 'lucide-react'
+import { Film, Download, X, Sparkles, Home, Palette, Image } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -22,11 +22,13 @@ interface SidebarProps {
   showStart: boolean
   onVisualConceptToggle: () => void
   showVisualConcept: boolean
+  onFrameExtractorToggle: () => void
+  showFrameExtractor: boolean
 }
 
-type TabType = 'start' | 'project' | 'visual' | 'nano'
+type TabType = 'start' | 'project' | 'visual' | 'nano' | 'frameExtractor'
 
-export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onVisualConceptClear, onNanoStudioToggle, showNanoStudio, onStartToggle, showStart, onVisualConceptToggle, showVisualConcept }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onVisualConceptClear, onNanoStudioToggle, showNanoStudio, onStartToggle, showStart, onVisualConceptToggle, showVisualConcept, onFrameExtractorToggle, showFrameExtractor }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<TabType>('start')
   return (
     <>
@@ -68,6 +70,8 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                   setActiveTab('start')
                   if (!showStart) onStartToggle()
                   if (showNanoStudio) onNanoStudioToggle()
+                  if (showVisualConcept) onVisualConceptToggle()
+                  if (showFrameExtractor) onFrameExtractorToggle()
                 }}
               >
                 <Home className="h-4 w-4 mr-2" />
@@ -77,7 +81,7 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                 variant="ghost"
                 className={cn(
                   "w-full justify-start rounded-full transition-all",
-                  activeTab === 'project' && !showStart && !showNanoStudio && !showVisualConcept
+                  activeTab === 'project' && !showStart && !showNanoStudio && !showVisualConcept && !showFrameExtractor
                     ? "bg-red-900/50 text-white hover:bg-red-900/70"
                     : "hover:bg-white/10 text-foreground"
                 )}
@@ -86,6 +90,7 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                   if (showStart) onStartToggle()
                   if (showNanoStudio) onNanoStudioToggle()
                   if (showVisualConcept) onVisualConceptToggle()
+                  if (showFrameExtractor) onFrameExtractorToggle()
                 }}
               >
                 <Film className="h-4 w-4 mr-2" />
@@ -103,7 +108,8 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                   setActiveTab('visual')
                   if (showStart) onStartToggle()
                   if (showNanoStudio) onNanoStudioToggle()
-                  if (!showVisualConcept && onVisualConceptToggle) onVisualConceptToggle()
+                  if (showFrameExtractor) onFrameExtractorToggle()
+                  if (!showVisualConcept) onVisualConceptToggle()
                 }}
               >
                 <Palette className="h-4 w-4 mr-2" />
@@ -120,12 +126,32 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                 onClick={() => {
                   setActiveTab('nano')
                   if (showStart) onStartToggle()
-                  if (showVisualConcept && onVisualConceptToggle) onVisualConceptToggle()
-                  onNanoStudioToggle()
+                  if (showVisualConcept) onVisualConceptToggle()
+                  if (showFrameExtractor) onFrameExtractorToggle()
+                  if (!showNanoStudio) onNanoStudioToggle()
                 }}
               >
                 <Sparkles className="h-4 w-4 mr-2" />
                 나노스튜디오
+              </Button>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start rounded-full transition-all",
+                  showFrameExtractor
+                    ? "bg-red-900/50 text-white hover:bg-red-900/70"
+                    : "hover:bg-white/10 text-foreground"
+                )}
+                onClick={() => {
+                  setActiveTab('frameExtractor')
+                  if (showStart) onStartToggle()
+                  if (showVisualConcept) onVisualConceptToggle()
+                  if (showNanoStudio) onNanoStudioToggle()
+                  if (!showFrameExtractor) onFrameExtractorToggle()
+                }}
+              >
+                <Image className="h-4 w-4 mr-2" />
+                프레임추출기
               </Button>
             </div>
           </div>
