@@ -79,7 +79,7 @@ export function Header({ onMenuClick, onUpload, onReset, scenario, script, scene
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setShowScenario(false)}
           />
-          <div className="relative bg-card border border-white/20 rounded-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden">
+          <div className="relative bg-card border border-white/20 rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold">시나리오</h2>
@@ -132,22 +132,71 @@ export function Header({ onMenuClick, onUpload, onReset, scenario, script, scene
             </div>
 
             {/* Content */}
-            <div className="p-6 overflow-y-auto max-h-[calc(85vh-10rem)]">
+            <div className="p-8 overflow-y-auto max-h-[calc(90vh-10rem)]">
               {activeTab === 'synopsis' && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-primary">전체 개요</h3>
-                  <pre className="text-sm leading-relaxed whitespace-pre-wrap font-sans text-muted-foreground">
-                    {scenario}
-                  </pre>
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold text-primary">전체 개요</h3>
+                  <div className="text-lg leading-[2] font-sans text-foreground space-y-6">
+                    {(() => {
+                      // 전체 시나리오를 막 단위로 분리
+                      const parts = scenario?.split(/(\d+막:)/) || []
+                      const elements: JSX.Element[] = []
+                      let currentText = ''
+
+                      for (let i = 0; i < parts.length; i++) {
+                        const part = parts[i]
+
+                        // "X막:" 패턴인 경우
+                        if (/^\d+막:$/.test(part)) {
+                          // 이전 텍스트가 있으면 먼저 렌더링
+                          if (currentText.trim()) {
+                            elements.push(
+                              <p key={`text-${i}`} className="text-foreground/90">
+                                {currentText.trim()}
+                              </p>
+                            )
+                            currentText = ''
+                          }
+
+                          // 다음 부분이 막 내용
+                          const actContent = parts[i + 1]?.trim() || ''
+                          elements.push(
+                            <div key={`act-${i}`} className="p-6 rounded-xl bg-white/5 border border-white/10">
+                              <p className="text-xl font-bold text-primary mb-3">{part}</p>
+                              <p className="text-foreground/90">{actContent}</p>
+                            </div>
+                          )
+                          i++ // 다음 부분은 이미 처리했으므로 스킵
+                        } else {
+                          currentText += part
+                        }
+                      }
+
+                      // 남은 텍스트 처리
+                      if (currentText.trim()) {
+                        currentText.split('\n\n').forEach((para, idx) => {
+                          if (para.trim()) {
+                            elements.push(
+                              <p key={`final-${idx}`} className="text-foreground/90">
+                                {para.trim()}
+                              </p>
+                            )
+                          }
+                        })
+                      }
+
+                      return elements
+                    })()}
+                  </div>
                 </div>
               )}
 
               {activeTab === 'script' && script && (
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-primary">영상 대본</h3>
-                  <pre className="text-sm leading-relaxed whitespace-pre-wrap font-sans text-muted-foreground">
+                <div className="space-y-6">
+                  <h3 className="text-2xl font-bold text-primary">영상 대본</h3>
+                  <div className="text-lg leading-[2] whitespace-pre-wrap font-sans text-foreground">
                     {script}
-                  </pre>
+                  </div>
                 </div>
               )}
 
