@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Menu, Upload, FileText, X } from 'lucide-react'
+import { Menu, Upload, FileText, X, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface Scene {
@@ -11,12 +11,13 @@ interface Scene {
 interface HeaderProps {
   onMenuClick: () => void
   onUpload: () => void
+  onReset: () => void
   scenario?: string
   script?: string
   scenes?: Scene[]
 }
 
-export function Header({ onMenuClick, onUpload, scenario, script, scenes }: HeaderProps) {
+export function Header({ onMenuClick, onUpload, onReset, scenario, script, scenes }: HeaderProps) {
   const [showScenario, setShowScenario] = useState(false)
   const [activeTab, setActiveTab] = useState<'synopsis' | 'script' | 'scenes'>('synopsis')
   return (
@@ -58,6 +59,14 @@ export function Header({ onMenuClick, onUpload, scenario, script, scenes }: Head
             >
               <Upload className="h-4 w-4 mr-2" />
               업로드
+            </Button>
+            <Button
+              onClick={onReset}
+              variant="outline"
+              className="rounded-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 transition-all"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              초기화
             </Button>
           </div>
         </div>

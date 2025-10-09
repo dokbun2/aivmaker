@@ -59,6 +59,12 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
   const [isEditingPrompt, setIsEditingPrompt] = useState(false)
   const [showPromptStructure, setShowPromptStructure] = useState(false)
 
+  // 비디오 URL 상태
+  const videoCacheKey = `frame_video_${sceneId}_${type}`
+  const getCachedVideoUrl = () => localStorage.getItem(videoCacheKey) || ''
+  const [videoUrl, setVideoUrl] = useState(getCachedVideoUrl())
+  const [showVideo, setShowVideo] = useState(!!getCachedVideoUrl())
+
   // 이미지 URL 변경 시 localStorage에 저장
   useEffect(() => {
     if (imageUrl.trim()) {
@@ -73,6 +79,13 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
     }
   }, [prompt, promptCacheKey])
 
+  // 비디오 URL 변경 시 localStorage에 저장
+  useEffect(() => {
+    if (videoUrl.trim()) {
+      localStorage.setItem(videoCacheKey, videoUrl)
+    }
+  }, [videoUrl, videoCacheKey])
+
   const handleCopy = async () => {
     await navigator.clipboard.writeText(prompt)
     setCopied(true)
@@ -83,6 +96,13 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
     if (imageUrl.trim()) {
       setShowImage(true)
       localStorage.setItem(cacheKey, imageUrl)
+    }
+  }
+
+  const handleAddVideo = () => {
+    if (videoUrl.trim()) {
+      setShowVideo(true)
+      localStorage.setItem(videoCacheKey, videoUrl)
     }
   }
 
@@ -202,23 +222,18 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
 
       {/* Image Upload */}
       <div className="space-y-3">
-        <div className="flex gap-2">
-          <Input
-            placeholder="이미지 URL 입력"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            className="bg-background/50 border-white/10"
-          />
-          <Button
-            onClick={handleAddImage}
-            variant="outline"
-            size="sm"
-            className="shrink-0"
-          >
-            <ImageIcon className="h-4 w-4 mr-2" />
-            {showImage ? '변경' : '추가'}
-          </Button>
-        </div>
+        <Input
+          placeholder="이미지 URL 입력 (Enter로 추가)"
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              handleAddImage()
+            }
+          }}
+          className="bg-background/50 border-white/10"
+        />
 
         {/* Image Preview */}
         {showImage && imageUrl && (
@@ -229,6 +244,36 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
               className="w-full h-auto object-contain"
               onError={() => setShowImage(false)}
             />
+          </div>
+        )}
+      </div>
+
+      {/* Video Upload */}
+      <div className="space-y-3">
+        <Input
+          placeholder="비디오 URL 입력 (Enter로 추가)"
+          value={videoUrl}
+          onChange={(e) => setVideoUrl(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault()
+              handleAddVideo()
+            }
+          }}
+          className="bg-background/50 border-white/10"
+        />
+
+        {/* Video Preview */}
+        {showVideo && videoUrl && (
+          <div className="relative rounded-lg overflow-hidden border border-white/10 bg-black">
+            <video
+              src={videoUrl}
+              controls
+              className="w-full h-auto"
+              onError={() => setShowVideo(false)}
+            >
+              브라우저가 비디오를 지원하지 않습니다.
+            </video>
           </div>
         )}
       </div>

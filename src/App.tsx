@@ -192,6 +192,39 @@ function App() {
     }
   }
 
+  const handleFullReset = () => {
+    if (confirm('프로젝트와 비주얼 컨셉을 포함한 모든 데이터를 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
+      // 프로젝트 데이터 초기화
+      setProjectData(null)
+
+      // 모든 localStorage 데이터 삭제
+      const keysToRemove: string[] = []
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        if (key && (
+          key.startsWith('frame_image_') ||
+          key.startsWith('frame_prompt_') ||
+          key.startsWith('character_image_') ||
+          key === 'currentProject'
+        )) {
+          keysToRemove.push(key)
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key))
+
+      // 파일 입력 초기화
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+
+      // START 화면으로 이동
+      setShowStart(true)
+      setShowNanoStudio(false)
+      setShowVisualConcept(false)
+      setShowFrameExtractor(false)
+    }
+  }
+
   const handleVisualConceptClear = () => {
     if (confirm('정말로 비주얼 컨셉을 초기화하시겠습니까?')) {
       // 캐릭터 이미지 캐시 삭제
@@ -244,6 +277,7 @@ function App() {
       <Header
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
         onUpload={handleUpload}
+        onReset={handleFullReset}
         scenario={projectData?.scenario}
         script={projectData?.script}
         scenes={projectData?.scenes}
