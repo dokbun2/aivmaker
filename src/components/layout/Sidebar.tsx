@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Film, Download, X, Sparkles, Home, Palette, Image } from 'lucide-react'
+import { Film, Download, X, Sparkles, Home, Palette, Image, ChevronDown, ChevronUp, Wand2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -30,6 +30,7 @@ type TabType = 'start' | 'project' | 'visual' | 'nano' | 'frameExtractor'
 
 export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onVisualConceptClear, onNanoStudioToggle, showNanoStudio, onStartToggle, showStart, onVisualConceptToggle, showVisualConcept, onFrameExtractorToggle, showFrameExtractor }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<TabType>('start')
+  const [freeToolsOpen, setFreeToolsOpen] = useState(false)
   return (
     <>
       {/* Mobile overlay */}
@@ -153,6 +154,33 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                 <Image className="h-4 w-4 mr-2" />
                 프레임추출기
               </Button>
+
+              {/* 무료툴 드롭다운 */}
+              <div className="space-y-1">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-between rounded-full hover:bg-white/10 text-foreground"
+                  onClick={() => setFreeToolsOpen(!freeToolsOpen)}
+                >
+                  <span className="flex items-center">
+                    <Wand2 className="h-4 w-4 mr-2" />
+                    무료툴
+                  </span>
+                  {freeToolsOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </Button>
+
+                {freeToolsOpen && (
+                  <div className="pl-6 space-y-1">
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start rounded-full hover:bg-white/10 text-foreground text-sm"
+                      onClick={() => window.open('https://img-fx.com/ai-image-upscaler', '_blank')}
+                    >
+                      업스케일러
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
