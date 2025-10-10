@@ -8,11 +8,17 @@ interface Scene {
   description?: string
 }
 
+interface ScenarioData {
+  logline?: string
+  synopsis?: string
+  treatment?: string
+}
+
 interface HeaderProps {
   onMenuClick: () => void
   onUpload: () => void
   onReset: () => void
-  scenario?: string
+  scenario?: string | ScenarioData
   script?: string
   scenes?: Scene[]
 }
@@ -138,8 +144,35 @@ export function Header({ onMenuClick, onUpload, onReset, scenario, script, scene
                   <h3 className="text-2xl font-bold text-primary">전체 개요</h3>
                   <div className="text-lg leading-[2] font-sans text-foreground space-y-6">
                     {(() => {
-                      // 전체 시나리오를 막 단위로 분리
-                      const parts = scenario?.split(/(\d+막:)/) || []
+                      // scenario가 객체인 경우
+                      if (scenario && typeof scenario === 'object') {
+                        return (
+                          <>
+                            {scenario.logline && (
+                              <div className="p-6 rounded-xl bg-primary/10 border border-primary/30">
+                                <p className="text-xl font-bold text-primary mb-3">로그라인</p>
+                                <p className="text-foreground/90">{scenario.logline}</p>
+                              </div>
+                            )}
+                            {scenario.synopsis && (
+                              <div className="p-6 rounded-xl bg-white/5 border border-white/10">
+                                <p className="text-xl font-bold text-primary mb-3">시놉시스</p>
+                                <p className="text-foreground/90">{scenario.synopsis}</p>
+                              </div>
+                            )}
+                            {scenario.treatment && (
+                              <div className="p-6 rounded-xl bg-white/5 border border-white/10">
+                                <p className="text-xl font-bold text-primary mb-3">트리트먼트</p>
+                                <p className="text-foreground/90 whitespace-pre-wrap">{scenario.treatment}</p>
+                              </div>
+                            )}
+                          </>
+                        )
+                      }
+
+                      // scenario가 문자열인 경우 (기존 로직)
+                      const scenarioText = typeof scenario === 'string' ? scenario : ''
+                      const parts = scenarioText.split(/(\d+막:)/)
                       const elements: React.ReactElement[] = []
                       let currentText = ''
 
