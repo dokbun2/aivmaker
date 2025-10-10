@@ -161,9 +161,59 @@ export function Header({ onMenuClick, onUpload, onReset, scenario, script, scene
                               </div>
                             )}
                             {scenario.treatment && (
-                              <div className="p-6 rounded-xl bg-white/5 border border-white/10">
-                                <p className="text-xl font-bold text-primary mb-3">트리트먼트</p>
-                                <p className="text-foreground/90 whitespace-pre-wrap">{scenario.treatment}</p>
+                              <div className="space-y-4">
+                                <p className="text-xl font-bold text-primary">트리트먼트</p>
+                                {(() => {
+                                  // treatment를 막 단위로 분리
+                                  const treatmentText = scenario.treatment
+                                  const parts = treatmentText.split(/(\d+막\s*\([^)]+\):)/)
+                                  const elements: React.ReactElement[] = []
+                                  let currentText = ''
+
+                                  for (let i = 0; i < parts.length; i++) {
+                                    const part = parts[i]
+
+                                    // "X막 (제목):" 패턴인 경우
+                                    if (/^\d+막\s*\([^)]+\):$/.test(part)) {
+                                      // 이전 텍스트가 있으면 먼저 렌더링
+                                      if (currentText.trim()) {
+                                        elements.push(
+                                          <p key={`text-${i}`} className="text-foreground/90">
+                                            {currentText.trim()}
+                                          </p>
+                                        )
+                                        currentText = ''
+                                      }
+
+                                      // 다음 부분이 막 내용
+                                      const actContent = parts[i + 1]?.trim() || ''
+                                      elements.push(
+                                        <div key={`act-${i}`} className="p-6 rounded-xl bg-white/5 border border-white/10">
+                                          <p className="text-lg font-bold text-primary mb-3">{part}</p>
+                                          <p className="text-foreground/90">{actContent}</p>
+                                        </div>
+                                      )
+                                      i++ // 다음 부분은 이미 처리했으므로 스킵
+                                    } else {
+                                      currentText += part
+                                    }
+                                  }
+
+                                  // 남은 텍스트 처리
+                                  if (currentText.trim()) {
+                                    elements.push(
+                                      <p key="final" className="text-foreground/90">
+                                        {currentText.trim()}
+                                      </p>
+                                    )
+                                  }
+
+                                  return elements.length > 0 ? elements : (
+                                    <div className="p-6 rounded-xl bg-white/5 border border-white/10">
+                                      <p className="text-foreground/90 whitespace-pre-wrap">{treatmentText}</p>
+                                    </div>
+                                  )
+                                })()}
                               </div>
                             )}
                           </>
