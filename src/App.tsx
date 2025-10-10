@@ -218,7 +218,11 @@ function App() {
       const keysToRemove: string[] = []
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i)
-        if (key && (key.startsWith('frame_image_') || key.startsWith('frame_prompt_'))) {
+        if (key && (
+          key.startsWith('frame_image_') ||
+          key.startsWith('frame_video_') ||
+          key.startsWith('frame_prompt_')
+        )) {
           keysToRemove.push(key)
         }
       }
@@ -244,6 +248,7 @@ function App() {
         const key = localStorage.key(i)
         if (key && (
           key.startsWith('frame_image_') ||
+          key.startsWith('frame_video_') ||
           key.startsWith('frame_prompt_') ||
           key.startsWith('character_image_') ||
           key === 'currentProject'
