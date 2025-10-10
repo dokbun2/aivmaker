@@ -37,7 +37,7 @@ export function Header({ onMenuClick, onUpload, onReset, scenario, script, scene
             <a href="/" className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
               <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-lg" />
               <div>
-                <h1 className="text-lg font-semibold">AI영상메이커</h1>
+                <h1 className="text-lg font-semibold">AI무비메이커</h1>
               </div>
             </a>
           </div>

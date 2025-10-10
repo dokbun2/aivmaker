@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI영상메이커 - A video project management tool for Midjourney v7 that allows users to manage video scenes with start/end frames, prompts, and transitions.
+AI무비메이커 - A video project management tool for Midjourney v7 that allows users to manage video scenes with start/end frames, prompts, and transitions.
 
 ## Development Commands
 
