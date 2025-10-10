@@ -135,8 +135,25 @@ function App() {
         try {
           const json = JSON.parse(e.target?.result as string)
           console.log('JSON 파일 로드 성공:', json)
-          console.log('캐릭터 데이터:', json.characters)
-          setProjectData(json)
+
+          // 새 형식 (백업 데이터 포함) 확인
+          if (json.projectData && json.cachedData) {
+            console.log('백업 데이터 감지 - 전체 복원 중...')
+            setProjectData(json.projectData)
+
+            // cachedData를 localStorage에 복원
+            Object.entries(json.cachedData).forEach(([key, value]) => {
+              localStorage.setItem(key, value as string)
+            })
+
+            console.log('캐시 데이터 복원 완료:', Object.keys(json.cachedData).length, '개 항목')
+          } else {
+            // 구 형식 (프로젝트 데이터만)
+            console.log('기본 프로젝트 데이터 로드')
+            console.log('캐릭터 데이터:', json.characters)
+            setProjectData(json)
+          }
+
           // 프로젝트 페이지로 이동
           setShowStart(false)
           setShowNanoStudio(false)
@@ -156,7 +173,31 @@ function App() {
   const handleDownload = () => {
     if (!projectData) return
 
-    const dataStr = JSON.stringify(projectData, null, 2)
+    // localStorage에서 모든 관련 데이터 수집
+    const cachedData: Record<string, string> = {}
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && (
+        key.startsWith('frame_image_') ||
+        key.startsWith('frame_video_') ||
+        key.startsWith('frame_prompt_') ||
+        key.startsWith('character_image_')
+      )) {
+        const value = localStorage.getItem(key)
+        if (value) {
+          cachedData[key] = value
+        }
+      }
+    }
+
+    // 프로젝트 데이터와 캐시 데이터를 함께 저장
+    const exportData = {
+      projectData,
+      cachedData,
+      exportedAt: new Date().toISOString()
+    }
+
+    const dataStr = JSON.stringify(exportData, null, 2)
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr)
 
     const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-')
