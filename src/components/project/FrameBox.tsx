@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Copy, Check, Play, Circle, Square, Image as ImageIcon } from 'lucide-react'
+import { Copy, Check, Play, Circle, Square } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface PromptStructure {

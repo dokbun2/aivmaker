@@ -99,7 +99,7 @@ function App() {
   const [showStart, setShowStart] = useState(true)
   const [showVisualConcept, setShowVisualConcept] = useState(false)
   const [showFrameExtractor, setShowFrameExtractor] = useState(false)
-  const [nanoStudioError, setNanoStudioError] = useState(false)
+  const [, setNanoStudioError] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 로컬 스토리지에서 프로젝트 로드

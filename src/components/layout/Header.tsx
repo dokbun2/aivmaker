@@ -140,7 +140,7 @@ export function Header({ onMenuClick, onUpload, onReset, scenario, script, scene
                     {(() => {
                       // 전체 시나리오를 막 단위로 분리
                       const parts = scenario?.split(/(\d+막:)/) || []
-                      const elements: JSX.Element[] = []
+                      const elements: React.ReactElement[] = []
                       let currentText = ''
 
                       for (let i = 0; i < parts.length; i++) {

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, Download, Image as ImageIcon, Video } from 'lucide-react'
+import { ChevronDown, Image as ImageIcon, Video } from 'lucide-react'
 import { SceneCard } from './SceneCard'
 import { EmptyState } from './EmptyState'
 import { Button } from '@/components/ui/button'
