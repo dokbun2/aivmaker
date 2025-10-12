@@ -205,11 +205,14 @@ export function ProjectManager({ projectData }: ProjectManagerProps) {
             onChange={(e) => setSelectedSceneIndex(Number(e.target.value))}
             className="w-full bg-secondary border border-white/20 rounded-lg px-4 py-3 pr-10 text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer"
           >
-            {projectData.scenes.map((scene, index) => (
-              <option key={scene.sceneId || scene.id || index} value={index}>
-                Scene {scene.sceneNumber || index + 1} {scene.title ? `- ${scene.title}` : ''}
-              </option>
-            ))}
+            {projectData.scenes.map((scene, index) => {
+              const sceneLabel = scene.sceneId || scene.title || `Scene ${scene.sceneNumber || index + 1}`
+              return (
+                <option key={scene.sceneId || scene.id || index} value={index}>
+                  {sceneLabel}
+                </option>
+              )
+            })}
           </select>
           <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
         </div>

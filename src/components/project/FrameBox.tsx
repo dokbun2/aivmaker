@@ -155,50 +155,6 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
         <p className="text-sm text-muted-foreground">{frame.description}</p>
       )}
 
-      {/* Motion Section */}
-      {frame.motion && (
-        <div className="p-4 rounded-lg bg-background/50 border border-white/10 backdrop-blur-xl space-y-3">
-          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase">
-            <span>영상 움직임</span>
-            {frame.motion.speed && (
-              <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 normal-case">
-                {frame.motion.speed}
-              </span>
-            )}
-          </div>
-
-          {/* Korean Motion Description */}
-          {frame.motion.ko && (
-            <p className="text-sm text-foreground leading-relaxed">
-              {frame.motion.ko}
-            </p>
-          )}
-
-          {/* English Motion Prompt with Copy */}
-          {frame.motion.en && (
-            <div className="relative">
-              <div className="flex items-start justify-between gap-4 p-3 rounded-md bg-background/80 border border-white/5">
-                <p className="text-xs font-mono text-muted-foreground leading-relaxed flex-1 break-words">
-                  {frame.motion.en}
-                </p>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={handleCopyMotion}
-                  className="shrink-0 h-7 w-7 p-0"
-                >
-                  {copiedMotion ? (
-                    <Check className="h-3 w-3 text-green-500" />
-                  ) : (
-                    <Copy className="h-3 w-3" />
-                  )}
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Prompt Structure Toggle */}
       {frame.promptStructure && (
         <Button
@@ -307,6 +263,50 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
           </div>
         )}
       </div>
+
+      {/* Motion Section */}
+      {frame.motion && (
+        <div className="p-4 rounded-lg bg-background/50 border border-white/10 backdrop-blur-xl space-y-3">
+          <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground uppercase">
+            <span>영상 움직임</span>
+            {frame.motion.speed && (
+              <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 normal-case">
+                {frame.motion.speed}
+              </span>
+            )}
+          </div>
+
+          {/* Korean Motion Description */}
+          {frame.motion.ko && (
+            <p className="text-sm text-foreground leading-relaxed">
+              {frame.motion.ko}
+            </p>
+          )}
+
+          {/* English Motion Prompt with Copy */}
+          {frame.motion.en && (
+            <div className="relative">
+              <div className="flex items-start justify-between gap-4 p-3 rounded-md bg-background/80 border border-white/5">
+                <p className="text-xs font-mono text-muted-foreground leading-relaxed flex-1 break-words">
+                  {frame.motion.en}
+                </p>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleCopyMotion}
+                  className="shrink-0 h-7 w-7 p-0"
+                >
+                  {copiedMotion ? (
+                    <Check className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Video Upload */}
       <div className="space-y-3">
