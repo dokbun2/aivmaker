@@ -21,6 +21,12 @@ interface PromptStructure {
   specialEffects?: string
 }
 
+interface Motion {
+  ko?: string
+  en?: string
+  speed?: string
+}
+
 interface Frame {
   shotType?: string
   duration?: number
@@ -29,6 +35,7 @@ interface Frame {
   prompt?: string
   parameters?: string
   imageUrl?: string
+  motion?: Motion
 }
 
 interface Scene {
