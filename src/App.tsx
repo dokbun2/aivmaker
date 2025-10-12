@@ -3,6 +3,7 @@ import { Header } from './components/layout/Header'
 import { Sidebar } from './components/layout/Sidebar'
 import { ProjectManager } from './components/project/ProjectManager'
 import { VisualConcept } from './components/project/VisualConcept'
+import { MultiDownloader } from './components/project/MultiDownloader'
 
 interface PromptStructure {
   subject?: string
@@ -99,6 +100,7 @@ function App() {
   const [showStart, setShowStart] = useState(true)
   const [showVisualConcept, setShowVisualConcept] = useState(false)
   const [showFrameExtractor, setShowFrameExtractor] = useState(false)
+  const [showMultiDownloader, setShowMultiDownloader] = useState(false)
   const [, setNanoStudioError] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -159,6 +161,7 @@ function App() {
           setShowNanoStudio(false)
           setShowVisualConcept(false)
           setShowFrameExtractor(false)
+          setShowMultiDownloader(false)
         } catch (error) {
           alert('JSON 파일 파싱 오류: ' + (error as Error).message)
         }
@@ -268,6 +271,7 @@ function App() {
       setShowNanoStudio(false)
       setShowVisualConcept(false)
       setShowFrameExtractor(false)
+      setShowMultiDownloader(false)
     }
   }
 
@@ -345,6 +349,8 @@ function App() {
         showVisualConcept={showVisualConcept}
         onFrameExtractorToggle={() => setShowFrameExtractor(!showFrameExtractor)}
         showFrameExtractor={showFrameExtractor}
+        onMultiDownloaderToggle={() => setShowMultiDownloader(!showMultiDownloader)}
+        showMultiDownloader={showMultiDownloader}
       />
 
       {/* Main Content */}
@@ -394,6 +400,10 @@ function App() {
               title="Frame Extractor"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             />
+          </div>
+        ) : showMultiDownloader ? (
+          <div className="w-full h-[calc(100vh-4rem)]">
+            <MultiDownloader />
           </div>
         ) : (
           <div className="p-2 lg:p-4">

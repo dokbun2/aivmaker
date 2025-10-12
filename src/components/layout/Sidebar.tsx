@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Film, Download, X, Sparkles, Home, Palette, Image, ChevronDown, ChevronUp, Wand2 } from 'lucide-react'
+import { Film, Download, X, Sparkles, Home, Palette, Image, ChevronDown, ChevronUp, Wand2, Download as DownloadIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -24,11 +24,13 @@ interface SidebarProps {
   showVisualConcept: boolean
   onFrameExtractorToggle: () => void
   showFrameExtractor: boolean
+  onMultiDownloaderToggle: () => void
+  showMultiDownloader: boolean
 }
 
-type TabType = 'start' | 'project' | 'visual' | 'nano' | 'frameExtractor'
+type TabType = 'start' | 'project' | 'visual' | 'nano' | 'frameExtractor' | 'multiDownloader'
 
-export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onVisualConceptClear, onNanoStudioToggle, showNanoStudio, onStartToggle, showStart, onVisualConceptToggle, showVisualConcept, onFrameExtractorToggle, showFrameExtractor }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onVisualConceptClear, onNanoStudioToggle, showNanoStudio, onStartToggle, showStart, onVisualConceptToggle, showVisualConcept, onFrameExtractorToggle, showFrameExtractor, onMultiDownloaderToggle, showMultiDownloader }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<TabType>('start')
   const [freeToolsOpen, setFreeToolsOpen] = useState(false)
   return (
@@ -177,6 +179,25 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                       onClick={() => window.open('https://img-fx.com/ai-image-upscaler', '_blank')}
                     >
                       업스케일러
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        "w-full justify-start rounded-full text-sm transition-all",
+                        showMultiDownloader
+                          ? "bg-red-900/50 text-white hover:bg-red-900/70"
+                          : "hover:bg-white/10 text-foreground"
+                      )}
+                      onClick={() => {
+                        setActiveTab('multiDownloader')
+                        if (showStart) onStartToggle()
+                        if (showVisualConcept) onVisualConceptToggle()
+                        if (showNanoStudio) onNanoStudioToggle()
+                        if (showFrameExtractor) onFrameExtractorToggle()
+                        if (!showMultiDownloader) onMultiDownloaderToggle()
+                      }}
+                    >
+                      Midjourny
                     </Button>
                   </div>
                 )}
