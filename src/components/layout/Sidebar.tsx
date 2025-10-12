@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Film, Download, X, Sparkles, Home, Palette, Image, ChevronDown, ChevronUp, Wand2, Download as DownloadIcon } from 'lucide-react'
+import { Film, Download, X, Sparkles, Home, Palette, Image, ChevronDown, ChevronUp, Wand2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
