@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Copy, Check, Play, Circle, Square } from 'lucide-react'
+import { Copy, Check, Play, Circle, Square, Upload } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface PromptStructure {
@@ -46,6 +46,7 @@ interface FrameBoxProps {
 export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
   const cacheKey = `frame_image_${sceneId}_${type}`
   const promptCacheKey = `frame_prompt_${sceneId}_${type}`
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // 캐시에서 이미지 URL 불러오기
   const getCachedUrl = () => {
@@ -110,6 +111,7 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
 
   const handleAddImage = () => {
     if (imageUrl.trim()) {
+      console.log('이미지 저장:', cacheKey, imageUrl)
       setShowImage(true)
       localStorage.setItem(cacheKey, imageUrl)
     }
@@ -117,9 +119,51 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
 
   const handleAddVideo = () => {
     if (videoUrl.trim()) {
+      console.log('비디오 저장:', videoCacheKey, videoUrl)
       setShowVideo(true)
       localStorage.setItem(videoCacheKey, videoUrl)
     }
+  }
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // 이미지 파일인지 확인
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드 가능합니다.')
+      return
+    }
+
+    // 파일 크기 확인 (5MB 제한)
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      alert('이미지 파일이 너무 큽니다. 5MB 이하의 이미지를 사용해주세요.')
+      return
+    }
+
+    // 파일을 base64로 변환
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string
+
+      try {
+        // localStorage에 저장 시도
+        localStorage.setItem(cacheKey, base64)
+        setImageUrl(base64)
+        setShowImage(true)
+      } catch (error) {
+        console.error('localStorage 저장 실패:', error)
+
+        // localStorage 용량 초과 시 URL만 표시
+        alert('⚠️ 저장 공간이 부족합니다.\n\n이미지를 외부 호스팅(Imgur, Cloudinary 등)에 업로드한 후 URL을 입력해주세요.\n\n또는 더 작은 크기의 이미지를 사용해주세요.')
+
+        // 임시로 표시는 하되 저장하지 않음
+        setImageUrl(base64)
+        setShowImage(true)
+      }
+    }
+    reader.readAsDataURL(file)
   }
 
   const Icon = type === 'start' ? Play : type === 'middle' ? Circle : Square
@@ -238,18 +282,35 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
 
       {/* Image Upload */}
       <div className="space-y-3">
-        <Input
-          placeholder="이미지 URL 입력 (Enter로 추가)"
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault()
-              handleAddImage()
-            }
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileUpload}
+          className="hidden"
+        />
+        <div className="flex gap-2">
+          <Input
+            placeholder="이미지 URL 입력 (Enter로 추가)"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault()
+                handleAddImage()
+              }
           }}
           className="bg-background/50 border-white/10"
         />
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-full border-white/20 hover:bg-white/10 shrink-0"
+          >
+            <Upload className="h-4 w-4" />
+          </Button>
+        </div>
 
         {/* Image Preview */}
         {showImage && imageUrl && (
