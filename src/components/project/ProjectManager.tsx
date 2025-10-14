@@ -181,7 +181,7 @@ export function ProjectManager({ projectData }: ProjectManagerProps) {
 
             // CORS 에러일 경우 no-cors 모드로 재시도
             try {
-              const response = await fetch(url, { mode: 'no-cors' })
+              await fetch(url, { mode: 'no-cors' })
               // no-cors 모드에서는 response를 읽을 수 없지만,
               // 적어도 네트워크 요청이 성공했다는 것을 알 수 있음
               console.log(`⚠ ${name}: CORS 제한으로 직접 다운로드 불가`)
