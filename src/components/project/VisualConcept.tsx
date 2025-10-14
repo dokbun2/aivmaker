@@ -9,10 +9,10 @@ import { cn } from '@/lib/utils'
 interface Character {
   id: string
   name: string
-  role: string
+  role?: string
   description: string
   visualDescription: string
-  consistency: {
+  consistency?: string | {
     age: string
     gender: string
     build?: string
@@ -22,7 +22,7 @@ interface Character {
     equipment?: string
     features: string
   }
-  consistency_tr?: {
+  consistency_tr?: string | {
     age: string
     gender: string
     build?: string
@@ -70,7 +70,7 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
       if (saved) images[char.id] = saved
 
       // 원본 한글 데이터 저장 (처음 로드시)
-      if (!currentKoreanState[char.id]) {
+      if (!currentKoreanState[char.id] && typeof char.consistency === 'object') {
         korean[char.id] = { ...char.consistency }
       }
     })
@@ -124,7 +124,19 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
     const character = characters.find(c => c.id === id)
     if (!character) return
 
-    const updatedConsistency = { ...character.consistency, [field]: value }
+    // consistency가 객체가 아니면 기본 객체 생성
+    const currentConsistency = typeof character.consistency === 'object' ? character.consistency : {
+      age: '',
+      gender: '',
+      build: '',
+      hair: '',
+      eyes: '',
+      outfit: '',
+      equipment: '',
+      features: ''
+    }
+
+    const updatedConsistency = { ...currentConsistency, [field]: value }
 
     // consistency 필드들로 visualDescription 자동 생성 (영문 모드일 때만)
     const currentIsKorean = isKorean[id] ?? true
@@ -170,23 +182,24 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
 
     if (currentIsKorean) {
       // 한글 → 영문: 원본 한글 저장 후 consistency_tr 값을 consistency로 복사
-      if (!originalKorean[id]) {
-        setOriginalKorean(prev => ({ ...prev, [id]: { ...character.consistency } }))
+      if (!originalKorean[id] && typeof character.consistency === 'object') {
+        setOriginalKorean(prev => ({ ...prev, [id]: { ...character.consistency as any } }))
       }
 
-      if (character.consistency_tr) {
+      if (character.consistency_tr && typeof character.consistency_tr === 'object') {
+        const tr = character.consistency_tr
         onUpdate(characters.map(char =>
           char.id === id ? {
             ...char,
             consistency: {
-              age: character.consistency_tr!.age,
-              gender: character.consistency_tr!.gender,
-              build: character.consistency_tr!.build,
-              hair: character.consistency_tr!.hair,
-              eyes: character.consistency_tr!.eyes,
-              outfit: character.consistency_tr!.outfit,
-              equipment: character.consistency_tr!.equipment,
-              features: character.consistency_tr!.features
+              age: tr.age,
+              gender: tr.gender,
+              build: tr.build,
+              hair: tr.hair,
+              eyes: tr.eyes,
+              outfit: tr.outfit,
+              equipment: tr.equipment,
+              features: tr.features
             }
           } : char
         ))
@@ -198,7 +211,7 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
         onUpdate(characters.map(char =>
           char.id === id ? {
             ...char,
-            consistency: { ...originalKorean[id] }
+            consistency: { ...originalKorean[id] as any }
           } : char
         ))
         setIsKorean(prev => ({ ...prev, [id]: true }))
@@ -250,7 +263,22 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
       </div>
 
       {/* Character Content */}
-      {selectedCharacter && (
+      {selectedCharacter && (() => {
+        // consistency를 안전하게 객체로 변환
+        const consistency = typeof selectedCharacter.consistency === 'object' && selectedCharacter.consistency
+          ? selectedCharacter.consistency
+          : {
+              age: '',
+              gender: '',
+              build: '',
+              hair: '',
+              eyes: '',
+              outfit: '',
+              equipment: '',
+              features: ''
+            }
+
+        return (
         <div className="grid grid-cols-2 gap-4">
           {/* Left: Character Info */}
           <Card className="backdrop-blur-xl bg-card/50 border-white/10">
@@ -345,49 +373,49 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <Input
-                    value={selectedCharacter.consistency.age}
+                    value={consistency.age}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'age', e.target.value)}
                     placeholder="나이"
                     className="bg-background/50 border-white/10 text-sm"
                   />
                   <Input
-                    value={selectedCharacter.consistency.gender}
+                    value={consistency.gender}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'gender', e.target.value)}
                     placeholder="성별"
                     className="bg-background/50 border-white/10 text-sm"
                   />
                   <Input
-                    value={selectedCharacter.consistency.build || ''}
+                    value={consistency.build || ''}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'build', e.target.value)}
                     placeholder="체격"
                     className="col-span-2 bg-background/50 border-white/10 text-sm"
                   />
                   <Input
-                    value={selectedCharacter.consistency.hair}
+                    value={consistency.hair}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'hair', e.target.value)}
                     placeholder="머리카락"
                     className="bg-background/50 border-white/10 text-sm"
                   />
                   <Input
-                    value={selectedCharacter.consistency.eyes}
+                    value={consistency.eyes}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'eyes', e.target.value)}
                     placeholder="눈"
                     className="bg-background/50 border-white/10 text-sm"
                   />
                   <Input
-                    value={selectedCharacter.consistency.outfit}
+                    value={consistency.outfit}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'outfit', e.target.value)}
                     placeholder="의상"
                     className="col-span-2 bg-background/50 border-white/10 text-sm"
                   />
                   <Input
-                    value={selectedCharacter.consistency.equipment || ''}
+                    value={consistency.equipment || ''}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'equipment', e.target.value)}
                     placeholder="장비"
                     className="col-span-2 bg-background/50 border-white/10 text-sm"
                   />
                   <Input
-                    value={selectedCharacter.consistency.features}
+                    value={consistency.features}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'features', e.target.value)}
                     placeholder="특징"
                     className="col-span-2 bg-background/50 border-white/10 text-sm"
@@ -427,7 +455,8 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
             </CardContent>
           </Card>
         </div>
-      )}
+        )
+      })()}
     </div>
   )
 }
