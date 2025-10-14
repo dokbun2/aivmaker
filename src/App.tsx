@@ -27,6 +27,12 @@ interface Motion {
   speed?: string
 }
 
+interface Setting {
+  location?: string
+  timeOfDay?: string
+  atmosphere?: string
+}
+
 interface Frame {
   shotType?: string
   duration?: number
@@ -35,18 +41,26 @@ interface Frame {
   prompt?: string
   parameters?: string
   imageUrl?: string
+  videoUrl?: string
   motion?: Motion
 }
 
 interface Scene {
+  scene?: number
   sceneNumber?: number
   sceneId?: string
   id?: string
   title?: string
   description?: string
   duration?: number
+  setting?: Setting
   charactersInScene?: string[]
   frames?: {
+    start: Frame
+    middle: Frame
+    end: Frame
+  }
+  shots?: {
     start: Frame
     middle: Frame
     end: Frame
@@ -60,10 +74,10 @@ interface Scene {
 interface Character {
   id: string
   name: string
-  role: string
+  role?: string
   description: string
   visualDescription: string
-  consistency: {
+  consistency?: string | {
     age: string
     gender: string
     build?: string
@@ -73,7 +87,7 @@ interface Character {
     equipment?: string
     features: string
   }
-  consistency_tr?: {
+  consistency_tr?: string | {
     age: string
     gender: string
     build?: string
@@ -85,19 +99,52 @@ interface Character {
   }
 }
 
+interface Scenario {
+  title?: string
+  summary?: string
+  script?: string
+}
+
 interface ProjectData {
   project: {
     title: string
     style: string
     aspectRatio: string
-    totalDuration: string
+    totalDuration: string | number
     description?: string
     createdAt?: string
   }
-  scenario?: string
+  scenario?: string | Scenario
   script?: string
   characters?: Character[]
   scenes: Scene[]
+}
+
+// shots → frames 변환 헬퍼 함수
+function convertShotsToFrames(data: ProjectData): ProjectData {
+  if (!data || !data.scenes) return data
+
+  const convertedScenes = data.scenes.map(scene => {
+    // shots가 있고 frames가 없으면 변환
+    if (scene.shots && !scene.frames) {
+      return {
+        ...scene,
+        sceneNumber: scene.scene || scene.sceneNumber,
+        frames: scene.shots,
+        shots: undefined
+      }
+    }
+    // sceneNumber 동기화
+    if (scene.scene && !scene.sceneNumber) {
+      return { ...scene, sceneNumber: scene.scene }
+    }
+    return scene
+  })
+
+  return {
+    ...data,
+    scenes: convertedScenes
+  }
 }
 
 function App() {
@@ -148,7 +195,10 @@ function App() {
           // 새 형식 (백업 데이터 포함) 확인
           if (json.projectData && json.cachedData) {
             console.log('백업 데이터 감지 - 전체 복원 중...')
-            setProjectData(json.projectData)
+
+            // shots → frames 변환
+            const convertedData = convertShotsToFrames(json.projectData)
+            setProjectData(convertedData)
 
             // cachedData를 localStorage에 복원
             Object.entries(json.cachedData).forEach(([key, value]) => {
@@ -160,7 +210,10 @@ function App() {
             // 구 형식 (프로젝트 데이터만)
             console.log('기본 프로젝트 데이터 로드')
             console.log('캐릭터 데이터:', json.characters)
-            setProjectData(json)
+
+            // shots → frames 변환
+            const convertedData = convertShotsToFrames(json)
+            setProjectData(convertedData)
           }
 
           // 프로젝트 페이지로 이동

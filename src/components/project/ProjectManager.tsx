@@ -21,6 +21,18 @@ interface PromptStructure {
   specialEffects?: string
 }
 
+interface Motion {
+  ko?: string
+  en?: string
+  speed?: string
+}
+
+interface Setting {
+  location?: string
+  timeOfDay?: string
+  atmosphere?: string
+}
+
 interface Frame {
   shotType?: string
   duration?: number
@@ -29,17 +41,26 @@ interface Frame {
   prompt?: string
   parameters?: string
   imageUrl?: string
+  videoUrl?: string
+  motion?: Motion
 }
 
 interface Scene {
+  scene?: number
   sceneNumber?: number
   sceneId?: string
   id?: string
   title?: string
   description?: string
   duration?: number
+  setting?: Setting
   charactersInScene?: string[]
   frames?: {
+    start: Frame
+    middle: Frame
+    end: Frame
+  }
+  shots?: {
     start: Frame
     middle: Frame
     end: Frame
@@ -55,7 +76,7 @@ interface ProjectData {
     title: string
     style: string
     aspectRatio: string
-    totalDuration: string
+    totalDuration: string | number
     description?: string
   }
   scenes: Scene[]
@@ -206,7 +227,12 @@ export function ProjectManager({ projectData }: ProjectManagerProps) {
             className="w-full bg-secondary border border-white/20 rounded-lg px-4 py-3 pr-10 text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer"
           >
             {projectData.scenes.map((scene, index) => {
-              const sceneLabel = scene.sceneId || scene.title || `Scene ${scene.sceneNumber || index + 1}`
+              const sceneNum = scene.scene || scene.sceneNumber || index + 1
+              const sceneDesc = scene.description || scene.title || ''
+              const sceneLabel = sceneDesc
+                ? `Scene ${sceneNum}: ${sceneDesc}`
+                : `Scene ${sceneNum}`
+
               return (
                 <option key={scene.sceneId || scene.id || index} value={index}>
                   {sceneLabel}

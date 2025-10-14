@@ -19,6 +19,18 @@ interface PromptStructure {
   specialEffects?: string
 }
 
+interface Motion {
+  ko?: string
+  en?: string
+  speed?: string
+}
+
+interface Setting {
+  location?: string
+  timeOfDay?: string
+  atmosphere?: string
+}
+
 interface Frame {
   shotType?: string
   duration?: number
@@ -27,17 +39,26 @@ interface Frame {
   prompt?: string
   parameters?: string
   imageUrl?: string
+  videoUrl?: string
+  motion?: Motion
 }
 
 interface Scene {
+  scene?: number
   sceneNumber?: number
   sceneId?: string
   id?: string
   title?: string
   description?: string
   duration?: number
+  setting?: Setting
   charactersInScene?: string[]
   frames?: {
+    start: Frame
+    middle: Frame
+    end: Frame
+  }
+  shots?: {
     start: Frame
     middle: Frame
     end: Frame

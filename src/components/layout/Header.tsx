@@ -1,14 +1,49 @@
 import { useState } from 'react'
-import { Menu, Upload, FileText, X, RefreshCw } from 'lucide-react'
+import { Menu, Upload, FileText, X, RefreshCw, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+interface Motion {
+  ko?: string
+  en?: string
+}
+
+interface Frame {
+  shotType?: string
+  duration?: number
+  description?: string
+  prompt?: string
+  motion?: Motion
+}
+
+interface Setting {
+  location?: string
+  timeOfDay?: string
+  atmosphere?: string
+}
+
 interface Scene {
+  scene?: number
   sceneNumber?: number
+  sceneId?: string
   title?: string
   description?: string
+  setting?: Setting
+  frames?: {
+    start?: Frame
+    middle?: Frame
+    end?: Frame
+  }
+  shots?: {
+    start?: Frame
+    middle?: Frame
+    end?: Frame
+  }
 }
 
 interface ScenarioData {
+  title?: string
+  summary?: string
+  script?: string
   logline?: string
   synopsis?: string
   treatment?: string
@@ -25,7 +60,20 @@ interface HeaderProps {
 
 export function Header({ onMenuClick, onUpload, onReset, scenario, script, scenes }: HeaderProps) {
   const [showScenario, setShowScenario] = useState(false)
-  const [activeTab, setActiveTab] = useState<'synopsis' | 'script' | 'scenes'>('synopsis')
+  const [expandedScenes, setExpandedScenes] = useState<Set<number>>(new Set())
+
+  const toggleScene = (index: number) => {
+    setExpandedScenes(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(index)) {
+        newSet.delete(index)
+      } else {
+        newSet.add(index)
+      }
+      return newSet
+    })
+  }
+
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/10 backdrop-blur-xl bg-background/80">
@@ -99,49 +147,12 @@ export function Header({ onMenuClick, onUpload, onReset, scenario, script, scene
               </Button>
             </div>
 
-            {/* Tabs */}
-            <div className="flex gap-1 px-6 pt-4 border-b border-white/10">
-              <button
-                onClick={() => setActiveTab('synopsis')}
-                className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
-                  activeTab === 'synopsis'
-                    ? 'bg-white/10 text-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
-                }`}
-              >
-                시놉시스
-              </button>
-              {script && (
-                <button
-                  onClick={() => setActiveTab('script')}
-                  className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
-                    activeTab === 'script'
-                      ? 'bg-white/10 text-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
-                  }`}
-                >
-                  대본
-                </button>
-              )}
-              {scenes && scenes.length > 0 && (
-                <button
-                  onClick={() => setActiveTab('scenes')}
-                  className={`px-4 py-2 rounded-t-lg text-sm font-medium transition-colors ${
-                    activeTab === 'scenes'
-                      ? 'bg-white/10 text-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
-                  }`}
-                >
-                  씬별 구성
-                </button>
-              )}
-            </div>
-
-            {/* Content */}
-            <div className="p-8 overflow-y-auto max-h-[calc(90vh-10rem)]">
-              {activeTab === 'synopsis' && (
+            {/* Content - 단일 탭으로 통합 */}
+            <div className="p-8 overflow-y-auto max-h-[calc(90vh-8rem)]">
+              <div className="space-y-8">
+                {/* 시나리오 개요 섹션 */}
                 <div className="space-y-6">
-                  <h3 className="text-2xl font-bold text-primary">전체 개요</h3>
+                  <h3 className="text-2xl font-bold text-primary border-b border-primary/30 pb-3">시나리오 개요</h3>
                   <div className="text-lg leading-[2] font-sans text-foreground space-y-6">
                     {(() => {
                       // scenario가 객체인 경우
@@ -272,39 +283,89 @@ export function Header({ onMenuClick, onUpload, onReset, scenario, script, scene
                     })()}
                   </div>
                 </div>
-              )}
 
-              {activeTab === 'script' && script && (
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-bold text-primary">영상 대본</h3>
-                  <div className="text-lg leading-[2] whitespace-pre-wrap font-sans text-foreground">
-                    {script}
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'scenes' && scenes && (
-                <div className="space-y-6">
-                  <h3 className="text-lg font-semibold text-primary">씬별 스토리</h3>
-                  {scenes.map((scene, index) => (
-                    <div key={index} className="p-4 rounded-lg bg-white/5 border border-white/10 space-y-2">
-                      <div className="flex items-center gap-3">
-                        <span className="px-2 py-1 rounded-md bg-primary/20 text-primary text-xs font-semibold">
-                          씬 {scene.sceneNumber || index + 1}
-                        </span>
-                        {scene.title && (
-                          <h4 className="font-semibold">{scene.title}</h4>
-                        )}
-                      </div>
-                      {scene.description && (
-                        <p className="text-sm text-muted-foreground leading-relaxed">
-                          {scene.description}
-                        </p>
-                      )}
+                {/* 대본 섹션 */}
+                {script && (
+                  <div className="space-y-6">
+                    <h3 className="text-2xl font-bold text-primary border-b border-primary/30 pb-3">영상 대본</h3>
+                    <div className="text-lg leading-[2] whitespace-pre-wrap font-sans text-foreground p-6 rounded-xl bg-white/5 border border-white/10">
+                      {script}
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
+                )}
+
+                {/* 씬별 구성 섹션 */}
+                {scenes && scenes.length > 0 && (
+                  <div className="space-y-6">
+                    <h3 className="text-2xl font-bold text-primary border-b border-primary/30 pb-3">씬별 구성</h3>
+                    <div className="space-y-4">
+                      {scenes.map((scene, index) => {
+                        const sceneNum = scene.scene || scene.sceneNumber || index + 1
+                        const frames = scene.frames || scene.shots
+                        const isExpanded = expandedScenes.has(index)
+
+                        return (
+                          <div key={index} className="rounded-xl bg-white/5 border border-white/10 overflow-hidden">
+                            {/* 씬 헤더 - 클릭 가능 */}
+                            <button
+                              onClick={() => toggleScene(index)}
+                              className="w-full p-6 text-left hover:bg-white/5 transition-colors"
+                            >
+                              <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-4 flex-1 min-w-0">
+                                  <span className="px-4 py-2 rounded-full bg-primary/20 text-primary text-lg font-bold flex-shrink-0">
+                                    Scene {sceneNum}
+                                  </span>
+                                  <div className="flex-1 min-w-0">
+                                    {scene.title && (
+                                      <h4 className="font-bold text-xl text-foreground mb-2">{scene.title}</h4>
+                                    )}
+                                    {scene.description && (
+                                      <p className="text-lg text-foreground/70 leading-relaxed line-clamp-2">
+                                        {scene.description}
+                                      </p>
+                                    )}
+                                  </div>
+                                </div>
+                                <ChevronDown
+                                  className={`w-6 h-6 text-primary flex-shrink-0 transition-transform duration-200 ${
+                                    isExpanded ? 'rotate-180' : ''
+                                  }`}
+                                />
+                              </div>
+                            </button>
+
+                            {/* 씬 내용 흐름 - 펼쳐질 때만 표시 */}
+                            {isExpanded && frames && (
+                              <div className="px-6 pb-6 pt-2 border-t border-white/10">
+                                <div className="space-y-5 pl-4 border-l-2 border-primary/20">
+                                  {['start', 'middle', 'end'].map((frameType, idx) => {
+                                    const frame = frames[frameType as keyof typeof frames]
+                                    if (!frame || !frame.description) return null
+
+                                    return (
+                                      <div key={frameType} className="flex gap-4">
+                                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+                                          <span className="text-base font-bold text-primary">{idx + 1}</span>
+                                        </div>
+                                        <div className="flex-1 pt-1">
+                                          <p className="text-lg text-foreground/80 leading-relaxed">
+                                            {frame.description}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
