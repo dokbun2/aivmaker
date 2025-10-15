@@ -242,24 +242,26 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
         </Button>
       </div>
 
-      {/* Character Tabs */}
-      <div className="flex gap-2 border-b border-white/10 pb-2">
-        {characters.map((character) => (
-          <Button
-            key={character.id}
-            variant="ghost"
-            onClick={() => setSelectedCharacterId(character.id)}
-            className={cn(
-              "rounded-full transition-all",
-              selectedCharacterId === character.id
-                ? "bg-red-900/50 text-white hover:bg-red-900/70"
-                : "hover:bg-white/10 text-foreground"
-            )}
-          >
-            <User className="h-4 w-4 mr-2" />
-            {character.name || '이름 없음'}
-          </Button>
-        ))}
+      {/* Character Tabs - 모바일 스크롤 가능 */}
+      <div className="overflow-x-auto scrollbar-hide">
+        <div className="flex gap-2 border-b border-white/10 pb-2 min-w-fit">
+          {characters.map((character) => (
+            <Button
+              key={character.id}
+              variant="ghost"
+              onClick={() => setSelectedCharacterId(character.id)}
+              className={cn(
+                "rounded-full transition-all whitespace-nowrap flex-shrink-0",
+                selectedCharacterId === character.id
+                  ? "bg-red-900/50 text-white hover:bg-red-900/70"
+                  : "hover:bg-white/10 text-foreground"
+              )}
+            >
+              <User className="h-4 w-4 mr-2" />
+              {character.name || '이름 없음'}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Character Content */}
@@ -279,25 +281,25 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
             }
 
         return (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Left: Character Info */}
           <Card className="backdrop-blur-xl bg-card/50 border-white/10">
             <CardHeader className="flex flex-row items-start justify-between space-y-0">
-              <div className="flex items-center gap-3">
-                <User className="h-5 w-5 text-primary" />
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <User className="h-5 w-5 text-primary flex-shrink-0" />
                 {editingId === selectedCharacter.id ? (
                   <Input
                     value={selectedCharacter.name}
                     onChange={(e) => updateCharacter(selectedCharacter.id, 'name', e.target.value)}
                     placeholder="캐릭터 이름"
-                    className="h-8 w-40 bg-background/50 border-white/10"
+                    className="h-8 max-w-[120px] sm:max-w-[160px] bg-background/50 border-white/10"
                   />
                 ) : (
-                  <CardTitle className="cursor-pointer" onClick={() => setEditingId(selectedCharacter.id)}>
+                  <CardTitle className="cursor-pointer truncate" onClick={() => setEditingId(selectedCharacter.id)}>
                     {selectedCharacter.name || '이름 없음'}
                   </CardTitle>
                 )}
-                <Badge variant="secondary">{selectedCharacter.role || '역할'}</Badge>
+                <Badge variant="secondary" className="flex-shrink-0 text-xs">{selectedCharacter.role || '역할'}</Badge>
               </div>
               <Button
                 variant="ghost"
@@ -355,8 +357,8 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
                 </div>
               </div>
 
-              {/* Consistency Details */}
-              <div>
+              {/* Consistency Details - 숨김 처리 (필요시 주석 해제) */}
+              {/* <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-xs text-muted-foreground">일관성 유지 정보</label>
                   <Button
@@ -371,7 +373,7 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
                     </span>
                   </Button>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <Input
                     value={consistency.age}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'age', e.target.value)}
@@ -388,7 +390,7 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
                     value={consistency.build || ''}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'build', e.target.value)}
                     placeholder="체격"
-                    className="col-span-2 bg-background/50 border-white/10 text-sm"
+                    className="sm:col-span-2 bg-background/50 border-white/10 text-sm"
                   />
                   <Input
                     value={consistency.hair}
@@ -406,22 +408,22 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
                     value={consistency.outfit}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'outfit', e.target.value)}
                     placeholder="의상"
-                    className="col-span-2 bg-background/50 border-white/10 text-sm"
+                    className="sm:col-span-2 bg-background/50 border-white/10 text-sm"
                   />
                   <Input
                     value={consistency.equipment || ''}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'equipment', e.target.value)}
                     placeholder="장비"
-                    className="col-span-2 bg-background/50 border-white/10 text-sm"
+                    className="sm:col-span-2 bg-background/50 border-white/10 text-sm"
                   />
                   <Input
                     value={consistency.features}
                     onChange={(e) => updateConsistency(selectedCharacter.id, 'features', e.target.value)}
                     placeholder="특징"
-                    className="col-span-2 bg-background/50 border-white/10 text-sm"
+                    className="sm:col-span-2 bg-background/50 border-white/10 text-sm"
                   />
                 </div>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
 
