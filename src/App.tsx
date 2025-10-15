@@ -477,7 +477,7 @@ function App() {
         ) : showFrameExtractor ? (
           <div className="fixed inset-0 top-16 lg:left-72">
             <iframe
-              src="https://frameex.netlify.app/"
+              src="https://framex-beta.vercel.app/"
               className="w-full h-full border-0"
               title="Frame Extractor"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

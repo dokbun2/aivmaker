@@ -154,7 +154,7 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                 }}
               >
                 <Image className="h-4 w-4 mr-2" />
-                손숩추출기
+                툴비추출기
               </Button>
 
               {/* 무료툴 드롭다운 */}
