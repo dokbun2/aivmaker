@@ -97,7 +97,7 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                 }}
               >
                 <Film className="h-4 w-4 mr-2" />
-                프로젝트
+                스토리텔링
               </Button>
               <Button
                 variant="ghost"
@@ -154,7 +154,7 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                 }}
               >
                 <Image className="h-4 w-4 mr-2" />
-                프레임추출기
+                손숩추출기
               </Button>
 
               {/* 무료툴 드롭다운 */}
@@ -197,7 +197,7 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                         if (!showMultiDownloader) onMultiDownloaderToggle()
                       }}
                     >
-                      Midjourny
+                      미드저니 다운
                     </Button>
                   </div>
                 )}
@@ -215,7 +215,7 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
                   className="w-full justify-start"
                 >
                   <Download className="h-4 w-4 mr-2" />
-                  프로젝트 다운로드
+                  스토리텔링 다운로드
                 </Button>
                 <Button
                   onClick={onClear}

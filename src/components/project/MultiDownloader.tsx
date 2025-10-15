@@ -173,7 +173,7 @@ export function MultiDownloader() {
       <div className="w-full space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-white">Midjourny</h1>
+          <h1 className="text-3xl font-bold text-white">미드저니 다운</h1>
         </div>
 
         {/* Tabs */}

@@ -6,8 +6,11 @@ import { cn } from '@/lib/utils'
 
 interface PromptStructure {
   subject?: string
-  style?: string
   composition?: string
+  style?: string
+  details?: string
+  parameters?: string
+  // Legacy fields kept for backward compatibility
   lighting?: string
   colors?: string
   mood?: string
@@ -54,10 +57,43 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
     return cached || frame.imageUrl || ''
   }
 
+  // promptStructure를 조합하여 프롬프트 생성
+  const combinePromptStructure = (structure: PromptStructure): string => {
+    const parts: string[] = []
+
+    // 새로운 구조 필드들 (순서 중요)
+    if (structure.subject) parts.push(structure.subject)
+    if (structure.composition) parts.push(structure.composition)
+    if (structure.style) parts.push(structure.style)
+    if (structure.details) parts.push(structure.details)
+    if (structure.parameters) parts.push(structure.parameters)
+
+    // 레거시 필드들도 포함 (하위 호환성)
+    if (structure.lighting) parts.push(structure.lighting)
+    if (structure.colors) parts.push(structure.colors)
+    if (structure.mood) parts.push(structure.mood)
+    if (structure.environment) parts.push(structure.environment)
+    if (structure.quality) parts.push(structure.quality)
+    if (structure.camera) parts.push(structure.camera)
+    if (structure.poseAction) parts.push(structure.poseAction)
+    if (structure.emotion) parts.push(structure.emotion)
+    if (structure.expression) parts.push(structure.expression)
+    if (structure.specialEffects) parts.push(structure.specialEffects)
+
+    return parts.filter(Boolean).join(' ')
+  }
+
   // 캐시에서 프롬프트 불러오기
   const getCachedPrompt = () => {
     const cached = localStorage.getItem(promptCacheKey)
-    return cached || frame.prompt || ''
+    if (cached) return cached
+
+    // 캐시가 없으면 promptStructure에서 생성
+    if (frame.promptStructure) {
+      return combinePromptStructure(frame.promptStructure)
+    }
+
+    return frame.prompt || ''
   }
 
   const [copied, setCopied] = useState(false)
@@ -214,14 +250,35 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
       {/* Prompt Structure Details */}
       {showPromptStructure && frame.promptStructure && (
         <div className="p-3 rounded-lg bg-background/50 border border-white/10 space-y-1 text-xs">
-          {Object.entries(frame.promptStructure).map(([key, value]) => (
-            value && (
+          {/* 새로운 필드들을 먼저 표시 */}
+          {['subject', 'composition', 'style', 'details', 'parameters'].map((key) => {
+            const value = frame.promptStructure?.[key as keyof PromptStructure]
+            if (!value) return null
+            return (
               <div key={key} className="flex gap-2">
                 <span className="text-muted-foreground min-w-[100px]">{key}:</span>
                 <span className="text-foreground">{value}</span>
               </div>
             )
-          ))}
+          })}
+          {/* 레거시 필드들 구분선과 함께 표시 */}
+          {Object.entries(frame.promptStructure)
+            .filter(([key]) => !['subject', 'composition', 'style', 'details', 'parameters'].includes(key))
+            .some(([, value]) => value) && (
+            <>
+              <div className="border-t border-white/10 my-2"></div>
+              {Object.entries(frame.promptStructure)
+                .filter(([key]) => !['subject', 'composition', 'style', 'details', 'parameters'].includes(key))
+                .map(([key, value]) => (
+                  value && (
+                    <div key={key} className="flex gap-2">
+                      <span className="text-muted-foreground min-w-[100px] opacity-70">{key}:</span>
+                      <span className="text-foreground opacity-70">{value}</span>
+                    </div>
+                  )
+                ))}
+            </>
+          )}
         </div>
       )}
 

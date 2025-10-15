@@ -7,8 +7,11 @@ import { MultiDownloader } from './components/project/MultiDownloader'
 
 interface PromptStructure {
   subject?: string
-  style?: string
   composition?: string
+  style?: string
+  details?: string
+  parameters?: string
+  // Legacy fields kept for backward compatibility
   lighting?: string
   colors?: string
   mood?: string
@@ -192,8 +195,27 @@ function App() {
           const json = JSON.parse(e.target?.result as string)
           console.log('JSON 파일 로드 성공:', json)
 
+          // 단일 씬 파일인 경우 (scene 또는 sceneNumber가 있고 project가 없는 경우)
+          if ((json.scene !== undefined || json.sceneNumber !== undefined) && !json.project) {
+            console.log('단일 씬 파일 감지 - 프로젝트 구조로 변환')
+
+            const singleSceneData: ProjectData = {
+              project: {
+                title: '테스트 프로젝트',
+                style: 'cinematic',
+                aspectRatio: '16:9',
+                totalDuration: json.duration || 12,
+                description: json.description || ''
+              },
+              scenes: [json]
+            }
+
+            // shots → frames 변환
+            const convertedData = convertShotsToFrames(singleSceneData)
+            setProjectData(convertedData)
+          }
           // 새 형식 (백업 데이터 포함) 확인
-          if (json.projectData && json.cachedData) {
+          else if (json.projectData && json.cachedData) {
             console.log('백업 데이터 감지 - 전체 복원 중...')
 
             // shots → frames 변환
