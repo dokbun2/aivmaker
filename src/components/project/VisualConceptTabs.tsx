@@ -12,8 +12,26 @@ interface Character {
   role?: string
   description: string
   visualDescription: string
-  consistency?: string
-  consistency_tr?: string
+  consistency?: string | {
+    age: string
+    gender: string
+    build?: string
+    hair: string
+    eyes: string
+    outfit: string
+    equipment?: string
+    features: string
+  }
+  consistency_tr?: string | {
+    age: string
+    gender: string
+    build?: string
+    hair: string
+    eyes: string
+    outfit: string
+    equipment?: string
+    features: string
+  }
 }
 
 interface KeyProp {
@@ -52,6 +70,15 @@ interface VisualConceptTabsProps {
 }
 
 type TabType = 'characters' | 'locations' | 'keyProps'
+
+interface LocationData {
+  id: string
+  scene: number
+  title: string
+  location: string
+  timeOfDay: string
+  atmosphere: string
+}
 
 export function VisualConceptTabs({
   characters = [],
@@ -121,7 +148,7 @@ export function VisualConceptTabs({
   }, [characters, keyProps, scenes])
 
   // 장소 정보 추출 (씬에서 중복 제거)
-  const locations = scenes
+  const locations: LocationData[] = scenes
     .filter(scene => scene.setting?.location)
     .map(scene => ({
       id: `loc_${scene.sceneId || scene.id || scene.scene || scene.sceneNumber}`,
@@ -131,14 +158,14 @@ export function VisualConceptTabs({
       timeOfDay: scene.setting?.timeOfDay || '',
       atmosphere: scene.setting?.atmosphere || ''
     }))
-    .reduce((acc, curr) => {
+    .reduce<LocationData[]>((acc, curr) => {
       // 중복된 location 제거
-      const exists = acc.find(l => l.location === curr.location)
+      const exists = acc.find((l: LocationData) => l.location === curr.location)
       if (!exists) {
         acc.push(curr)
       }
       return acc
-    }, [] as typeof locations)
+    }, [])
 
   const handleAddCharacter = () => {
     if (!onUpdateCharacters) return
