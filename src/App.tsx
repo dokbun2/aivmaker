@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Header } from './components/layout/Header'
 import { Sidebar } from './components/layout/Sidebar'
 import { ProjectManager } from './components/project/ProjectManager'
-import { VisualConcept } from './components/project/VisualConcept'
+import { VisualConceptTabs } from './components/project/VisualConceptTabs'
 import { MultiDownloader } from './components/project/MultiDownloader'
 
 interface PromptStructure {
@@ -108,6 +108,15 @@ interface Scenario {
   script?: string
 }
 
+interface KeyProp {
+  id: string
+  name: string
+  description: string
+  visualDescription: string
+  consistency?: string
+  consistency_tr?: string
+}
+
 interface ProjectData {
   project: {
     title: string
@@ -120,6 +129,7 @@ interface ProjectData {
   scenario?: string | Scenario
   script?: string
   characters?: Character[]
+  keyProps?: KeyProp[]
   scenes: Scene[]
 }
 
@@ -384,6 +394,13 @@ function App() {
     }
   }
 
+  const handleUpdateKeyProps = (keyProps: KeyProp[]) => {
+    if (projectData) {
+      const updated = { ...projectData, keyProps }
+      setProjectData(updated)
+    }
+  }
+
   const projectInfo = projectData && projectData.project
     ? {
         title: projectData.project.title || '제목 없음',
@@ -457,9 +474,12 @@ function App() {
           </div>
         ) : showVisualConcept ? (
           <div className="p-2 lg:p-4">
-            <VisualConcept
+            <VisualConceptTabs
               characters={projectData?.characters || []}
-              onUpdate={handleUpdateCharacters}
+              keyProps={projectData?.keyProps || []}
+              scenes={projectData?.scenes || []}
+              onUpdateCharacters={handleUpdateCharacters}
+              onUpdateKeyProps={handleUpdateKeyProps}
             />
           </div>
         ) : showNanoStudio ? (
