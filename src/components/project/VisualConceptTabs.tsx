@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, Trash2, User, Copy, MapPin, Package } from 'lucide-react'
+import { Plus, Trash2, User, Copy, Check, MapPin, Package } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
@@ -93,6 +93,7 @@ export function VisualConceptTabs({
   const [characterImages, setCharacterImages] = useState<Record<string, string>>({})
   const [keyPropImages, setKeyPropImages] = useState<Record<string, string>>({})
   const [locationImages, setLocationImages] = useState<Record<string, string>>({})
+  const [copiedId, setCopiedId] = useState<string | null>(null)
 
   // 첫 번째 아이템 자동 선택
   useEffect(() => {
@@ -243,8 +244,10 @@ export function VisualConceptTabs({
     }
   }
 
-  const handleCopy = (text: string) => {
+  const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text)
+    setCopiedId(id)
+    setTimeout(() => setCopiedId(null), 2000)
   }
 
   // 현재 탭에 따른 선택된 아이템
@@ -405,10 +408,14 @@ export function VisualConceptTabs({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleCopy(selectedCharacter.visualDescription)}
-                        className="absolute top-2 right-2 h-8 w-8 p-0"
+                        onClick={() => handleCopy(selectedCharacter.visualDescription, `char_visual_${selectedCharacter.id}`)}
+                        className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
                       >
-                        <Copy className="h-4 w-4" />
+                        {copiedId === `char_visual_${selectedCharacter.id}` ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -495,10 +502,14 @@ export function VisualConceptTabs({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleCopy(selectedLocation.location)}
-                        className="absolute top-2 right-2 h-8 w-8 p-0"
+                        onClick={() => handleCopy(selectedLocation.location, `loc_${selectedLocation.id}`)}
+                        className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
                       >
-                        <Copy className="h-4 w-4" />
+                        {copiedId === `loc_${selectedLocation.id}` ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -532,10 +543,14 @@ export function VisualConceptTabs({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleCopy(`${selectedLocation.location}${selectedLocation.timeOfDay ? `, ${selectedLocation.timeOfDay}` : ''}${selectedLocation.atmosphere ? `, ${selectedLocation.atmosphere}` : ''}`)}
-                        className="absolute top-2 right-2 h-8 w-8 p-0"
+                        onClick={() => handleCopy(`${selectedLocation.location}${selectedLocation.timeOfDay ? `, ${selectedLocation.timeOfDay}` : ''}${selectedLocation.atmosphere ? `, ${selectedLocation.atmosphere}` : ''}`, `loc_full_${selectedLocation.id}`)}
+                        className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
                       >
-                        <Copy className="h-4 w-4" />
+                        {copiedId === `loc_full_${selectedLocation.id}` ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
                   </div>
@@ -652,10 +667,14 @@ export function VisualConceptTabs({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleCopy(selectedKeyProp.visualDescription)}
-                        className="absolute top-2 right-2 h-8 w-8 p-0"
+                        onClick={() => handleCopy(selectedKeyProp.visualDescription, `prop_visual_${selectedKeyProp.id}`)}
+                        className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
                       >
-                        <Copy className="h-4 w-4" />
+                        {copiedId === `prop_visual_${selectedKeyProp.id}` ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
                   </div>

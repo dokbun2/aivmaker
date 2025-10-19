@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Plus, Trash2, User, Copy } from 'lucide-react'
+import { Plus, Trash2, User, Copy, Check } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
@@ -43,6 +43,7 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null)
   const [characterImages, setCharacterImages] = useState<Record<string, string>>({})
+  const [copiedId, setCopiedId] = useState<string | null>(null)
   // isKorean과 originalKorean state 제거 (사용하지 않음)
 
   // 첫 캐릭터 자동 선택
@@ -116,8 +117,10 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
     localStorage.setItem(`character_image_${id}`, url)
   }
 
-  const handleCopyVisualDescription = (text: string) => {
+  const handleCopyVisualDescription = (text: string, id: string) => {
     navigator.clipboard.writeText(text)
+    setCopiedId(id)
+    setTimeout(() => setCopiedId(null), 2000)
   }
 
   // handleToggleLanguage 함수 제거 (사용하지 않음)
@@ -240,10 +243,14 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleCopyVisualDescription(selectedCharacter.visualDescription)}
-                    className="absolute top-2 right-2 h-8 w-8 p-0"
+                    onClick={() => handleCopyVisualDescription(selectedCharacter.visualDescription, `char_${selectedCharacter.id}`)}
+                    className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
                   >
-                    <Copy className="h-4 w-4" />
+                    {copiedId === `char_${selectedCharacter.id}` ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>
