@@ -94,6 +94,8 @@ export function VisualConceptTabs({
   const [keyPropImages, setKeyPropImages] = useState<Record<string, string>>({})
   const [locationImages, setLocationImages] = useState<Record<string, string>>({})
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [locationOverrides, setLocationOverrides] = useState<Record<string, LocationData>>({})
+  const [fullPromptOverrides, setFullPromptOverrides] = useState<Record<string, string>>({})
 
   // 첫 번째 아이템 자동 선택
   useEffect(() => {
@@ -118,11 +120,13 @@ export function VisualConceptTabs({
     }
   }, [activeTab, characters, keyProps, scenes, selectedId])
 
-  // localStorage에서 이미지 로드
+  // localStorage에서 이미지와 장소 데이터 로드
   useEffect(() => {
     const charImages: Record<string, string> = {}
     const propImages: Record<string, string> = {}
     const locImages: Record<string, string> = {}
+    const locOverrides: Record<string, LocationData> = {}
+    const fullPrompts: Record<string, string> = {}
 
     characters.forEach(char => {
       const saved = localStorage.getItem(`character_image_${char.id}`)
@@ -134,31 +138,50 @@ export function VisualConceptTabs({
       if (saved) propImages[prop.id] = saved
     })
 
-    // 장소 이미지 로드
+    // 장소 이미지와 오버라이드 데이터 로드
     scenes.forEach(scene => {
       if (scene.setting?.location) {
         const locId = `loc_${scene.sceneId || scene.id || scene.scene || scene.sceneNumber}`
-        const saved = localStorage.getItem(`location_image_${locId}`)
-        if (saved) locImages[locId] = saved
+        const savedImage = localStorage.getItem(`location_image_${locId}`)
+        if (savedImage) locImages[locId] = savedImage
+
+        const savedData = localStorage.getItem(`location_data_${locId}`)
+        if (savedData) {
+          try {
+            locOverrides[locId] = JSON.parse(savedData)
+          } catch (e) {
+            console.error('Failed to parse location data:', e)
+          }
+        }
+
+        const savedFullPrompt = localStorage.getItem(`location_full_prompt_${locId}`)
+        if (savedFullPrompt) fullPrompts[locId] = savedFullPrompt
       }
     })
 
     setCharacterImages(charImages)
     setKeyPropImages(propImages)
     setLocationImages(locImages)
+    setLocationOverrides(locOverrides)
+    setFullPromptOverrides(fullPrompts)
   }, [characters, keyProps, scenes])
 
-  // 장소 정보 추출 (씬에서 중복 제거)
+  // 장소 정보 추출 (씬에서 중복 제거) - 오버라이드 적용
   const locations: LocationData[] = scenes
     .filter(scene => scene.setting?.location)
-    .map(scene => ({
-      id: `loc_${scene.sceneId || scene.id || scene.scene || scene.sceneNumber}`,
-      scene: scene.scene || scene.sceneNumber || 0,
-      title: scene.title || '',
-      location: scene.setting!.location!,
-      timeOfDay: scene.setting?.timeOfDay || '',
-      atmosphere: scene.setting?.atmosphere || ''
-    }))
+    .map(scene => {
+      const locId = `loc_${scene.sceneId || scene.id || scene.scene || scene.sceneNumber}`
+      const override = locationOverrides[locId]
+
+      return {
+        id: locId,
+        scene: scene.scene || scene.sceneNumber || 0,
+        title: scene.title || '',
+        location: override?.location || scene.setting!.location!,
+        timeOfDay: override?.timeOfDay || scene.setting?.timeOfDay || '',
+        atmosphere: override?.atmosphere || scene.setting?.atmosphere || ''
+      }
+    })
     .reduce<LocationData[]>((acc, curr) => {
       // 중복된 location 제거
       const exists = acc.find((l: LocationData) => l.location === curr.location)
@@ -229,6 +252,29 @@ export function VisualConceptTabs({
     onUpdateKeyProps(keyProps.map(prop =>
       prop.id === id ? { ...prop, [field]: value } : prop
     ))
+  }
+
+  const handleUpdateLocation = (id: string, field: keyof LocationData, value: string) => {
+    const updatedLocation = {
+      ...locations.find(l => l.id === id)!,
+      [field]: value
+    }
+
+    setLocationOverrides(prev => ({
+      ...prev,
+      [id]: updatedLocation
+    }))
+
+    localStorage.setItem(`location_data_${id}`, JSON.stringify(updatedLocation))
+  }
+
+  const handleUpdateFullPrompt = (id: string, value: string) => {
+    setFullPromptOverrides(prev => ({
+      ...prev,
+      [id]: value
+    }))
+
+    localStorage.setItem(`location_full_prompt_${id}`, value)
   }
 
   const handleImageUrlChange = (type: 'character' | 'keyprop' | 'location', id: string, url: string) => {
@@ -491,13 +537,14 @@ export function VisualConceptTabs({
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="text-xs text-muted-foreground">장소 프롬프트</label>
+                    <label className="text-xs text-muted-foreground">장소 프롬프트 (클릭하여 수정)</label>
                     <div className="relative">
                       <textarea
                         value={selectedLocation.location}
-                        readOnly
-                        className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono resize-none focus:outline-none"
+                        onChange={(e) => handleUpdateLocation(selectedLocation.id, 'location', e.target.value)}
+                        className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
                         rows={4}
+                        placeholder="장소 프롬프트를 입력하세요..."
                       />
                       <Button
                         variant="ghost"
@@ -513,37 +560,44 @@ export function VisualConceptTabs({
                       </Button>
                     </div>
                   </div>
-                  {selectedLocation.timeOfDay && (
-                    <div>
-                      <label className="text-xs text-muted-foreground">시간대</label>
-                      <div className="bg-background/50 border border-white/10 rounded-lg px-3 py-2 text-sm">
-                        {selectedLocation.timeOfDay}
-                      </div>
-                    </div>
-                  )}
-                  {selectedLocation.atmosphere && (
-                    <div>
-                      <label className="text-xs text-muted-foreground">분위기</label>
-                      <div className="bg-background/50 border border-white/10 rounded-lg px-3 py-2 text-sm">
-                        {selectedLocation.atmosphere}
-                      </div>
-                    </div>
-                  )}
+                  <div>
+                    <label className="text-xs text-muted-foreground">시간대 (클릭하여 수정)</label>
+                    <Input
+                      value={selectedLocation.timeOfDay}
+                      onChange={(e) => handleUpdateLocation(selectedLocation.id, 'timeOfDay', e.target.value)}
+                      placeholder="예: at night, during sunset..."
+                      className="bg-background/50 border-white/10"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground">분위기 (클릭하여 수정)</label>
+                    <Input
+                      value={selectedLocation.atmosphere}
+                      onChange={(e) => handleUpdateLocation(selectedLocation.id, 'atmosphere', e.target.value)}
+                      placeholder="예: chaotic, peaceful, mysterious..."
+                      className="bg-background/50 border-white/10"
+                    />
+                  </div>
 
                   {/* 전체 프롬프트 조합 */}
                   <div>
-                    <label className="text-xs text-muted-foreground">전체 프롬프트 (장소 + 시간 + 분위기)</label>
+                    <label className="text-xs text-muted-foreground">전체 프롬프트 (장소 + 시간 + 분위기) - 클릭하여 수정</label>
                     <div className="relative">
                       <textarea
-                        value={`${selectedLocation.location}${selectedLocation.timeOfDay ? `, ${selectedLocation.timeOfDay}` : ''}${selectedLocation.atmosphere ? `, ${selectedLocation.atmosphere}` : ''}`}
-                        readOnly
-                        className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono resize-none focus:outline-none"
+                        value={fullPromptOverrides[selectedLocation.id] || `${selectedLocation.location}${selectedLocation.timeOfDay ? `, ${selectedLocation.timeOfDay}` : ''}${selectedLocation.atmosphere ? `, ${selectedLocation.atmosphere}` : ''}`}
+                        onChange={(e) => handleUpdateFullPrompt(selectedLocation.id, e.target.value)}
+                        className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
                         rows={3}
+                        placeholder="전체 프롬프트를 입력하세요..."
                       />
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleCopy(`${selectedLocation.location}${selectedLocation.timeOfDay ? `, ${selectedLocation.timeOfDay}` : ''}${selectedLocation.atmosphere ? `, ${selectedLocation.atmosphere}` : ''}`, `loc_full_${selectedLocation.id}`)}
+                        onClick={() => handleCopy(
+                          fullPromptOverrides[selectedLocation.id] ||
+                          `${selectedLocation.location}${selectedLocation.timeOfDay ? `, ${selectedLocation.timeOfDay}` : ''}${selectedLocation.atmosphere ? `, ${selectedLocation.atmosphere}` : ''}`,
+                          `loc_full_${selectedLocation.id}`
+                        )}
                         className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
                       >
                         {copiedId === `loc_full_${selectedLocation.id}` ? (
