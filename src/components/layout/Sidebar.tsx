@@ -6,15 +6,6 @@ import { cn } from '@/lib/utils'
 interface SidebarProps {
   isOpen: boolean
   onClose: () => void
-  projectInfo?: {
-    title: string
-    style: string
-    aspectRatio: string
-    totalDuration: string
-    scenesCount: number
-  }
-  onClear: () => void
-  onVisualConceptClear: () => void
   onNanoStudioToggle: () => void
   showNanoStudio: boolean
   onStartToggle: () => void
@@ -29,7 +20,7 @@ interface SidebarProps {
 
 type TabType = 'start' | 'project' | 'visual' | 'nano' | 'frameExtractor' | 'multiDownloader'
 
-export function Sidebar({ isOpen, onClose, projectInfo, onClear, onVisualConceptClear, onNanoStudioToggle, showNanoStudio, onStartToggle, showStart, onVisualConceptToggle, showVisualConcept, onFrameExtractorToggle, showFrameExtractor, onMultiDownloaderToggle, showMultiDownloader }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, onStartToggle, showStart, onVisualConceptToggle, showVisualConcept, onFrameExtractorToggle, showFrameExtractor, onMultiDownloaderToggle, showMultiDownloader }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<TabType>('start')
   const [freeToolsOpen, setFreeToolsOpen] = useState(false)
   return (

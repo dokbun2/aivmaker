@@ -305,32 +305,32 @@ function App() {
     linkElement.click()
   }
 
-  const handleClear = () => {
-    if (confirm('정말로 프로젝트를 초기화하시겠습니까?')) {
-      setProjectData(null)
+  // const handleClear = () => {
+  //   if (confirm('정말로 프로젝트를 초기화하시겠습니까?')) {
+  //     setProjectData(null)
 
-      // 모든 localStorage 항목 중 프레임 관련 캐시 삭제
-      const keysToRemove: string[] = []
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && (
-          key.startsWith('frame_image_') ||
-          key.startsWith('frame_video_') ||
-          key.startsWith('frame_prompt_')
-        )) {
-          keysToRemove.push(key)
-        }
-      }
-      keysToRemove.forEach(key => localStorage.removeItem(key))
+  //     // 모든 localStorage 항목 중 프레임 관련 캐시 삭제
+  //     const keysToRemove: string[] = []
+  //     for (let i = 0; i < localStorage.length; i++) {
+  //       const key = localStorage.key(i)
+  //       if (key && (
+  //         key.startsWith('frame_image_') ||
+  //         key.startsWith('frame_video_') ||
+  //         key.startsWith('frame_prompt_')
+  //       )) {
+  //         keysToRemove.push(key)
+  //       }
+  //     }
+  //     keysToRemove.forEach(key => localStorage.removeItem(key))
 
-      // 프로젝트 데이터 삭제
-      localStorage.removeItem('currentProject')
+  //     // 프로젝트 데이터 삭제
+  //     localStorage.removeItem('currentProject')
 
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''
-      }
-    }
-  }
+  //     if (fileInputRef.current) {
+  //       fileInputRef.current.value = ''
+  //     }
+  //   }
+  // }
 
   const handleFullReset = () => {
     if (confirm('프로젝트와 비주얼 컨셉을 포함한 모든 데이터를 초기화하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
@@ -367,25 +367,25 @@ function App() {
     }
   }
 
-  const handleVisualConceptClear = () => {
-    if (confirm('정말로 비주얼 컨셉을 초기화하시겠습니까?')) {
-      // 캐릭터 이미지 캐시 삭제
-      const keysToRemove: string[] = []
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        if (key && key.startsWith('character_image_')) {
-          keysToRemove.push(key)
-        }
-      }
-      keysToRemove.forEach(key => localStorage.removeItem(key))
+  // const handleVisualConceptClear = () => {
+  //   if (confirm('정말로 비주얼 컨셉을 초기화하시겠습니까?')) {
+  //     // 캐릭터 이미지 캐시 삭제
+  //     const keysToRemove: string[] = []
+  //     for (let i = 0; i < localStorage.length; i++) {
+  //       const key = localStorage.key(i)
+  //       if (key && key.startsWith('character_image_')) {
+  //         keysToRemove.push(key)
+  //       }
+  //     }
+  //     keysToRemove.forEach(key => localStorage.removeItem(key))
 
-      // 프로젝트 데이터에서 캐릭터 제거
-      if (projectData) {
-        const updated = { ...projectData, characters: [] }
-        setProjectData(updated)
-      }
-    }
-  }
+  //     // 프로젝트 데이터에서 캐릭터 제거
+  //     if (projectData) {
+  //       const updated = { ...projectData, characters: [] }
+  //       setProjectData(updated)
+  //     }
+  //   }
+  // }
 
   const handleUpdateCharacters = (characters: Character[]) => {
     if (projectData) {
@@ -401,15 +401,15 @@ function App() {
     }
   }
 
-  const projectInfo = projectData && projectData.project
-    ? {
-        title: projectData.project.title || '제목 없음',
-        style: projectData.project.style || 'cinematic',
-        aspectRatio: String(projectData.project.aspectRatio) || '16:9',
-        totalDuration: String(projectData.project.totalDuration) || '미정',
-        scenesCount: projectData.scenes?.length || 0,
-      }
-    : undefined
+  // const projectInfo = projectData && projectData.project
+  //   ? {
+  //       title: projectData.project.title || '제목 없음',
+  //       style: projectData.project.style || 'cinematic',
+  //       aspectRatio: String(projectData.project.aspectRatio) || '16:9',
+  //       totalDuration: String(projectData.project.totalDuration) || '미정',
+  //       scenesCount: projectData.scenes?.length || 0,
+  //     }
+  //   : undefined
 
   return (
     <div className="min-h-screen bg-black">
@@ -437,9 +437,6 @@ function App() {
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
-        projectInfo={projectInfo}
-        onClear={handleClear}
-        onVisualConceptClear={handleVisualConceptClear}
         onNanoStudioToggle={() => setShowNanoStudio(!showNanoStudio)}
         showNanoStudio={showNanoStudio}
         onStartToggle={() => setShowStart(!showStart)}
