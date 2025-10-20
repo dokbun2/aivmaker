@@ -495,7 +495,7 @@ function App() {
             />
           </div>
         ) : showFrameExtractor ? (
-          <div className="fixed inset-0 top-16 lg:left-72">
+          <div className="fixed inset-0 top-16 lg:left-56">
             <iframe
               src="https://framex-beta.vercel.app/"
               className="w-full h-full border-0"
