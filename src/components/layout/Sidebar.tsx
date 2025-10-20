@@ -13,7 +13,6 @@ interface SidebarProps {
     totalDuration: string
     scenesCount: number
   }
-  onDownload: () => void
   onClear: () => void
   onVisualConceptClear: () => void
   onNanoStudioToggle: () => void
@@ -30,7 +29,7 @@ interface SidebarProps {
 
 type TabType = 'start' | 'project' | 'visual' | 'nano' | 'frameExtractor' | 'multiDownloader'
 
-export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onVisualConceptClear, onNanoStudioToggle, showNanoStudio, onStartToggle, showStart, onVisualConceptToggle, showVisualConcept, onFrameExtractorToggle, showFrameExtractor, onMultiDownloaderToggle, showMultiDownloader }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, projectInfo, onClear, onVisualConceptClear, onNanoStudioToggle, showNanoStudio, onStartToggle, showStart, onVisualConceptToggle, showVisualConcept, onFrameExtractorToggle, showFrameExtractor, onMultiDownloaderToggle, showMultiDownloader }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<TabType>('start')
   const [freeToolsOpen, setFreeToolsOpen] = useState(false)
   return (

@@ -438,7 +438,6 @@ function App() {
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         projectInfo={projectInfo}
-        onDownload={handleDownload}
         onClear={handleClear}
         onVisualConceptClear={handleVisualConceptClear}
         onNanoStudioToggle={() => setShowNanoStudio(!showNanoStudio)}
