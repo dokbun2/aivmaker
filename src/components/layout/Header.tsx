@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Menu, Upload, FileText, X, RefreshCw, ChevronDown } from 'lucide-react'
+import { Menu, Upload, FileText, X, RefreshCw, ChevronDown, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface Motion {
@@ -53,12 +53,13 @@ interface HeaderProps {
   onMenuClick: () => void
   onUpload: () => void
   onReset: () => void
+  onBackup: () => void
   scenario?: string | ScenarioData
   script?: string
   scenes?: Scene[]
 }
 
-export function Header({ onMenuClick, onUpload, onReset, scenario, script, scenes }: HeaderProps) {
+export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, script, scenes }: HeaderProps) {
   const [showScenario, setShowScenario] = useState(false)
   const [expandedScenes, setExpandedScenes] = useState<Set<number>>(new Set())
 
@@ -113,6 +114,14 @@ export function Header({ onMenuClick, onUpload, onReset, scenario, script, scene
             >
               <Upload className="h-4 w-4 mr-2" />
               업로드
+            </Button>
+            <Button
+              onClick={onBackup}
+              variant="outline"
+              className="rounded-full border-white/20 hover:bg-white/10"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              백업
             </Button>
             <Button
               onClick={onReset}

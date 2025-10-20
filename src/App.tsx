@@ -427,6 +427,7 @@ function App() {
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
         onUpload={handleUpload}
         onReset={handleFullReset}
+        onBackup={handleDownload}
         scenario={projectData?.scenario}
         script={projectData?.script}
         scenes={projectData?.scenes}
@@ -453,7 +454,7 @@ function App() {
       />
 
       {/* Main Content */}
-      <main className="pt-16 lg:pl-72 min-h-screen">
+      <main className="pt-16 lg:pl-56 min-h-screen">
         {showStart ? (
           <div className="w-full h-[calc(100vh-4rem)] flex items-center justify-center bg-black relative">
             <img

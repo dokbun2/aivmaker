@@ -236,83 +236,86 @@ export function ProjectManager({ projectData }: ProjectManagerProps) {
 
   return (
     <div className="space-y-4">
-      {/* Project Info & Description Combined */}
-      <div className="backdrop-blur-xl bg-card/50 border border-white/10 rounded-2xl p-4">
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm flex-1">
-            <div className="flex gap-2">
-              <span className="text-muted-foreground">제목:</span>
-              <span className="font-medium">{projectData.project.title}</span>
+      {/* Project Info & Scene Selector - 2 Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Project Info & Description Combined */}
+        <div className="backdrop-blur-xl bg-card/50 border border-white/10 rounded-2xl p-4">
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm flex-1">
+              <div className="flex gap-2">
+                <span className="text-muted-foreground">제목:</span>
+                <span className="font-medium">{projectData.project.title}</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-muted-foreground">스타일:</span>
+                <span className="font-medium">{projectData.project.style}</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-muted-foreground">화면 비율:</span>
+                <span className="font-medium">{projectData.project.aspectRatio}</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="text-muted-foreground">총 길이:</span>
+                <span className="font-medium">{projectData.project.totalDuration}</span>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <span className="text-muted-foreground">스타일:</span>
-              <span className="font-medium">{projectData.project.style}</span>
-            </div>
-            <div className="flex gap-2">
-              <span className="text-muted-foreground">화면 비율:</span>
-              <span className="font-medium">{projectData.project.aspectRatio}</span>
-            </div>
-            <div className="flex gap-2">
-              <span className="text-muted-foreground">총 길이:</span>
-              <span className="font-medium">{projectData.project.totalDuration}</span>
-            </div>
-          </div>
 
-          {/* Download Buttons */}
-          <div className="flex gap-2 shrink-0">
-            <Button
-              onClick={() => downloadMediaAsZip('image')}
-              disabled={downloading}
-              variant="outline"
-              size="sm"
-              className="rounded-full border-white/20 hover:bg-white/10"
-            >
-              <ImageIcon className="h-4 w-4 mr-2" />
-              이미지 다운
-            </Button>
-            <Button
-              onClick={() => downloadMediaAsZip('video')}
-              disabled={downloading}
-              variant="outline"
-              size="sm"
-              className="rounded-full border-white/20 hover:bg-white/10"
-            >
-              <Video className="h-4 w-4 mr-2" />
-              비디오 다운
-            </Button>
+            {/* Download Buttons */}
+            <div className="flex gap-2 shrink-0">
+              <Button
+                onClick={() => downloadMediaAsZip('image')}
+                disabled={downloading}
+                variant="outline"
+                size="sm"
+                className="rounded-full border-white/20 hover:bg-white/10"
+              >
+                <ImageIcon className="h-4 w-4 mr-2" />
+                이미지 다운
+              </Button>
+              <Button
+                onClick={() => downloadMediaAsZip('video')}
+                disabled={downloading}
+                variant="outline"
+                size="sm"
+                className="rounded-full border-white/20 hover:bg-white/10"
+              >
+                <Video className="h-4 w-4 mr-2" />
+                비디오 다운
+              </Button>
+            </div>
           </div>
+          {projectData.project.description && (
+            <div className="pt-3 border-t border-white/10">
+              <p className="text-sm text-muted-foreground">{projectData.project.description}</p>
+            </div>
+          )}
         </div>
-        {projectData.project.description && (
-          <div className="pt-3 border-t border-white/10">
-            <p className="text-sm text-muted-foreground">{projectData.project.description}</p>
+
+        {/* Scene Selector Dropdown */}
+        <div className="backdrop-blur-xl bg-card/50 border border-white/10 rounded-2xl p-4">
+          <label className="block text-sm font-medium mb-2">씬 선택</label>
+          <div className="relative">
+            <select
+              value={selectedSceneIndex}
+              onChange={(e) => setSelectedSceneIndex(Number(e.target.value))}
+              className="w-full bg-secondary border border-white/20 rounded-lg px-4 py-3 pr-10 text-sm text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer"
+            >
+              {projectData.scenes.map((scene, index) => {
+                const sceneNum = scene.scene || scene.sceneNumber || index + 1
+                const sceneDesc = scene.description || scene.title || ''
+                const sceneLabel = sceneDesc
+                  ? `Scene ${sceneNum}: ${sceneDesc}`
+                  : `Scene ${sceneNum}`
+
+                return (
+                  <option key={scene.sceneId || scene.id || index} value={index}>
+                    {sceneLabel}
+                  </option>
+                )
+              })}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
           </div>
-        )}
-      </div>
-
-      {/* Scene Selector Dropdown */}
-      <div className="backdrop-blur-xl bg-card/50 border border-white/10 rounded-2xl p-4">
-        <label className="block text-sm font-medium mb-2">씬 선택</label>
-        <div className="relative">
-          <select
-            value={selectedSceneIndex}
-            onChange={(e) => setSelectedSceneIndex(Number(e.target.value))}
-            className="w-full bg-secondary border border-white/20 rounded-lg px-4 py-3 pr-10 text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer"
-          >
-            {projectData.scenes.map((scene, index) => {
-              const sceneNum = scene.scene || scene.sceneNumber || index + 1
-              const sceneDesc = scene.description || scene.title || ''
-              const sceneLabel = sceneDesc
-                ? `Scene ${sceneNum}: ${sceneDesc}`
-                : `Scene ${sceneNum}`
-
-              return (
-                <option key={scene.sceneId || scene.id || index} value={index}>
-                  {sceneLabel}
-                </option>
-              )
-            })}
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
         </div>
       </div>
 

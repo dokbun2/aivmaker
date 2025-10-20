@@ -483,11 +483,11 @@ export function VisualConceptTabs({
                     />
                   </div>
                   {characterImages[selectedCharacter.id] && (
-                    <div className="border border-white/10 rounded-lg overflow-hidden bg-background/30">
+                    <div className="h-[300px] border border-white/10 rounded-lg overflow-hidden bg-black/50 flex items-center justify-center">
                       <img
                         src={characterImages[selectedCharacter.id]}
                         alt={selectedCharacter.name}
-                        className="w-full h-auto object-contain"
+                        className="w-full h-full object-contain"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none'
                         }}
@@ -626,11 +626,11 @@ export function VisualConceptTabs({
                     />
                   </div>
                   {locationImages[selectedLocation.id] && (
-                    <div className="border border-white/10 rounded-lg overflow-hidden bg-background/30">
+                    <div className="h-[300px] border border-white/10 rounded-lg overflow-hidden bg-black/50 flex items-center justify-center">
                       <img
                         src={locationImages[selectedLocation.id]}
                         alt={`Scene ${selectedLocation.scene}`}
-                        className="w-full h-auto object-contain"
+                        className="w-full h-full object-contain"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none'
                         }}
@@ -750,11 +750,11 @@ export function VisualConceptTabs({
                     />
                   </div>
                   {keyPropImages[selectedKeyProp.id] && (
-                    <div className="border border-white/10 rounded-lg overflow-hidden bg-background/30">
+                    <div className="h-[300px] border border-white/10 rounded-lg overflow-hidden bg-black/50 flex items-center justify-center">
                       <img
                         src={keyPropImages[selectedKeyProp.id]}
                         alt={selectedKeyProp.name}
-                        className="w-full h-auto object-contain"
+                        className="w-full h-full object-contain"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none'
                         }}

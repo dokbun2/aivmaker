@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Film, Download, X, Sparkles, Home, Palette, Image, ChevronDown, ChevronUp, Wand2 } from 'lucide-react'
+import { Film, X, Sparkles, Home, Palette, Image, ChevronDown, ChevronUp, Wand2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -46,7 +46,7 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-16 left-0 bottom-0 w-72 border-r border-white/10 backdrop-blur-xl bg-background/80 z-40 transition-transform duration-300",
+          "fixed top-16 left-0 bottom-0 w-56 border-r border-white/10 backdrop-blur-xl bg-background/80 z-40 transition-transform duration-300",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
@@ -209,14 +209,6 @@ export function Sidebar({ isOpen, onClose, projectInfo, onDownload, onClear, onV
           <div className="flex-1 p-4 overflow-y-auto">
             {activeTab === 'project' && projectInfo && (
               <div className="space-y-2">
-                <Button
-                  onClick={onDownload}
-                  variant="outline"
-                  className="w-full justify-start"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  스토리텔링 다운로드
-                </Button>
                 <Button
                   onClick={onClear}
                   variant="ghost"

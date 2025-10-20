@@ -275,11 +275,11 @@ export function VisualConcept({ characters, onUpdate }: VisualConceptProps) {
                 />
               </div>
               {characterImages[selectedCharacter.id] && (
-                <div className="border border-white/10 rounded-lg overflow-hidden bg-background/30">
+                <div className="h-[300px] border border-white/10 rounded-lg overflow-hidden bg-black/50 flex items-center justify-center">
                   <img
                     src={characterImages[selectedCharacter.id]}
                     alt={selectedCharacter.name}
-                    className="w-full h-auto object-contain"
+                    className="w-full h-full object-contain"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none'
                     }}
