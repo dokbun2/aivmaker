@@ -454,7 +454,7 @@ function App() {
         {showStart ? (
           <div className="w-full h-[calc(100vh-4rem)] flex items-center justify-center bg-black relative">
             <img
-              src="https://cdn.midjourney.com/d221c817-6fa3-47dd-9864-6d06c64cc12e/0_1.png"
+              src="https://cdn.midjourney.com/f9fe5d85-8abf-42ad-9d22-77806380f095/0_0.png"
               alt="Main"
               className="w-full h-full object-cover"
             />
@@ -463,7 +463,7 @@ function App() {
                 href="https://gemini.google.com/gem/1zximT5wRr3zL-y3D_4HKAL909Bzwy8I0?usp=sharing"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-4 bg-red-900/80 hover:bg-red-900 text-white font-bold text-xl rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 border border-white/20"
+                className="px-8 py-4 bg-red-900/80 hover:bg-red-900 text-white font-bold text-xl rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105 border border-white/20 mt-24"
               >
                 START
               </a>
