@@ -92,7 +92,7 @@ export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, scr
             <a href="/" className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
               <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-lg" />
               <div>
-                <h1 className="text-lg font-semibold">AI툴박스</h1>
+                <h1 className="text-lg font-semibold">AI툴비</h1>
               </div>
             </a>
           </div>
