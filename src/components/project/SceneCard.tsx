@@ -225,72 +225,90 @@ function FramePage({
           )}
         </div>
 
-        {/* 프롬프트 - 전체 너비 */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium">프롬프트</h4>
-            <div className="flex gap-2">
-              {!isEditingPrompt && (
-                <>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={handleEditPrompt}
-                    className="h-8 px-2"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={handleCopy}
-                    className="h-8 px-2"
-                  >
-                    {copied ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {isEditingPrompt ? (
-            <div className="space-y-2">
-              <Textarea
-                value={editedPrompt}
-                onChange={(e) => setEditedPrompt(e.target.value)}
-                className="min-h-[200px] font-mono text-sm"
-                placeholder="프롬프트를 입력하세요..."
-              />
+        {/* 프롬프트와 AI 어시스턴트 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* 왼쪽: 프롬프트 */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-medium">프롬프트</h4>
               <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={handleSavePrompt}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  <Save className="h-4 w-4 mr-1" />
-                  저장
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={handleCancelEdit}
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  취소
-                </Button>
+                {!isEditingPrompt && (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleEditPrompt}
+                      className="h-8 px-2"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleCopy}
+                      className="h-8 px-2"
+                    >
+                      {copied ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
-          ) : (
-            <div className="p-4 rounded-lg bg-white/5 border border-white/10">
-              <p className="text-sm font-mono whitespace-pre-wrap">
-                {displayPrompt || '프롬프트가 없습니다'}
-              </p>
+
+            {isEditingPrompt ? (
+              <div className="space-y-2">
+                <Textarea
+                  value={editedPrompt}
+                  onChange={(e) => setEditedPrompt(e.target.value)}
+                  className="min-h-[400px] lg:min-h-[350px] font-mono text-sm resize-none"
+                  placeholder="프롬프트를 입력하세요..."
+                />
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    onClick={handleSavePrompt}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Save className="h-4 w-4 mr-1" />
+                    저장
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleCancelEdit}
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    취소
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 rounded-lg bg-white/5 border border-white/10 h-[400px] lg:h-[350px] overflow-y-auto">
+                <p className="text-sm font-mono whitespace-pre-wrap">
+                  {displayPrompt || '프롬프트가 없습니다'}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* 오른쪽: AI 프롬프트 어시스턴트 */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-medium">AI 프롬프트 어시스턴트</h4>
             </div>
-          )}
+            <div className="rounded-lg border border-white/10 overflow-hidden h-[400px] lg:h-[350px] bg-black/20">
+              <iframe
+                src="https://prompt-transformation-chat-252213558759.us-west1.run.app"
+                className="w-full h-full"
+                title="AI Prompt Assistant"
+                style={{ backgroundColor: 'transparent' }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* 모션 */}
