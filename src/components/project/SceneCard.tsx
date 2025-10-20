@@ -228,8 +228,8 @@ function FramePage({
         {/* 프롬프트와 AI 어시스턴트 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* 왼쪽: 프롬프트 */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <div className="flex items-center justify-between h-8 mb-2">
               <h4 className="text-sm font-medium">프롬프트</h4>
               <div className="flex gap-2">
                 {!isEditingPrompt && (
@@ -260,11 +260,11 @@ function FramePage({
             </div>
 
             {isEditingPrompt ? (
-              <div className="space-y-2">
+              <div className="flex-1 flex flex-col gap-2">
                 <Textarea
                   value={editedPrompt}
                   onChange={(e) => setEditedPrompt(e.target.value)}
-                  className="min-h-[400px] lg:min-h-[350px] font-mono text-sm resize-none"
+                  className="flex-1 min-h-[400px] lg:min-h-[350px] font-mono text-sm resize-none"
                   placeholder="프롬프트를 입력하세요..."
                 />
                 <div className="flex gap-2">
@@ -295,10 +295,10 @@ function FramePage({
             )}
           </div>
 
-          {/* 오른쪽: AI 프롬프트 어시스턴트 */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium">AI 프롬프트 어시스턴트</h4>
+          {/* 오른쪽: TOOLBEE BOT */}
+          <div className="flex flex-col">
+            <div className="flex items-center justify-between h-8 mb-2">
+              <h4 className="text-sm font-medium">TOOLBEE BOT</h4>
             </div>
             <div className="rounded-lg border border-white/10 overflow-hidden h-[400px] lg:h-[350px] bg-black/20">
               <iframe

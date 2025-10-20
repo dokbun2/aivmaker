@@ -204,32 +204,9 @@ export function Sidebar({ isOpen, onClose, projectInfo, onClear, onVisualConcept
             </div>
           </div>
 
-          {/* Tab Content */}
+          {/* Tab Content - 현재는 비어있음 */}
           <div className="flex-1 p-4 overflow-y-auto">
-            {activeTab === 'project' && projectInfo && (
-              <div className="space-y-2">
-                <Button
-                  onClick={onClear}
-                  variant="ghost"
-                  className="w-full justify-start text-red-400 hover:text-red-300"
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  초기화
-                </Button>
-              </div>
-            )}
-            {activeTab === 'visual' && (
-              <div className="space-y-2">
-                <Button
-                  onClick={onVisualConceptClear}
-                  variant="ghost"
-                  className="w-full justify-start text-red-400 hover:text-red-300"
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  초기화
-                </Button>
-              </div>
-            )}
+            {/* 필요시 여기에 탭별 추가 콘텐츠를 넣을 수 있습니다 */}
           </div>
         </div>
       </aside>
