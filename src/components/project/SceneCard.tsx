@@ -190,9 +190,65 @@ function FramePage({
     setTimeout(() => setCopied(false), 2000)
   }
 
+  // promptStructure를 영상 프롬프트로 조립하는 함수
+  const generateVideoPrompt = (frame: Frame): string => {
+    if (!frame.promptStructure) return ''
+
+    const ps = frame.promptStructure
+    const parts: string[] = []
+
+    // 1. STYLE (스타일)
+    if (ps.style) parts.push(ps.style)
+
+    // 2. CAMERA (카메라 - composition 필드 사용)
+    if (ps.composition) parts.push(ps.composition)
+
+    // 3. SUBJECT (주체)
+    if (ps.subject) {
+      // subject가 "In/On..."으로 시작하면 분리 필요
+      const subjectMatch = ps.subject.match(/^(?:In|On|At)\s+[^,]+,\s+(.+)/)
+      if (subjectMatch) {
+        parts.push(`of ${subjectMatch[1]}`)
+      } else {
+        parts.push(`of ${ps.subject}`)
+      }
+    }
+
+    // 4. ACTION (promptStructure에는 없지만 subject에 포함되어 있을 수 있음)
+
+    // 5. SETTING (장소 - subject의 앞부분에서 추출)
+    if (ps.subject) {
+      const settingMatch = ps.subject.match(/^((?:In|On|At)\s+[^,]+)/)
+      if (settingMatch) {
+        parts.push(settingMatch[1].toLowerCase())
+      }
+    }
+
+    // 6. ATMOSPHERE (분위기 - details 필드 사용)
+    if (ps.details) parts.push(ps.details)
+
+    // 추가 필드들
+    if (ps.lighting) parts.push(ps.lighting)
+    if (ps.colors) parts.push(ps.colors)
+    if (ps.mood) parts.push(ps.mood)
+    if (ps.environment) parts.push(ps.environment)
+
+    return parts.filter(Boolean).join(', ') + '.'
+  }
+
   const handleCopyMotion = async () => {
-    if (frame.motion?.en) {
+    // 1. motion.en이 있으면 그대로 사용
+    if (frame.motion?.en && frame.motion.en !== "No camera movement.") {
       await navigator.clipboard.writeText(frame.motion.en)
+      setCopiedMotion(true)
+      setTimeout(() => setCopiedMotion(false), 2000)
+      return
+    }
+
+    // 2. motion.en이 없거나 "No camera movement."인 경우, promptStructure에서 생성
+    const generatedPrompt = generateVideoPrompt(frame)
+    if (generatedPrompt) {
+      await navigator.clipboard.writeText(generatedPrompt)
       setCopiedMotion(true)
       setTimeout(() => setCopiedMotion(false), 2000)
     }
@@ -312,31 +368,41 @@ function FramePage({
         </div>
 
         {/* 모션 */}
-        {frame.motion && (frame.motion.ko || frame.motion.en) && (
+        {(frame.motion || frame.promptStructure) && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <h4 className="text-sm font-medium">모션</h4>
-              {frame.motion.en && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={handleCopyMotion}
-                  className="h-8 px-2"
-                >
-                  {copiedMotion ? (
-                    <Check className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <Copy className="h-4 w-4" />
-                  )}
-                </Button>
-              )}
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleCopyMotion}
+                className="h-8 px-2"
+              >
+                {copiedMotion ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
             </div>
             <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
-              <p className="text-sm text-blue-400">
-                {frame.motion.ko && frame.motion.en
-                  ? `${frame.motion.ko} / ${frame.motion.en}`
-                  : frame.motion.ko || frame.motion.en}
-                {frame.motion.speed && ` (${frame.motion.speed})`}
+              {/* 한국어 설명 */}
+              {frame.motion?.ko && (
+                <p className="text-sm text-blue-400 mb-2">
+                  {frame.motion.ko}
+                  {frame.motion.speed && ` (${frame.motion.speed})`}
+                </p>
+              )}
+              {/* 영어 프롬프트 - motion.en이 없거나 "No camera movement."인 경우 자동 생성 */}
+              <p className="text-xs font-mono text-blue-300/80 leading-relaxed">
+                {(() => {
+                  if (frame.motion?.en && frame.motion.en !== "No camera movement.") {
+                    return frame.motion.en
+                  } else if (frame.promptStructure) {
+                    return generateVideoPrompt(frame)
+                  }
+                  return "No camera movement."
+                })()}
               </p>
             </div>
           </div>
