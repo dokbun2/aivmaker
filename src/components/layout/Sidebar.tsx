@@ -125,7 +125,7 @@ export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, o
                 }}
               >
                 <Sparkles className="h-4 w-4 mr-2" />
-                나노스튜디오
+                툴비스튜디오
               </Button>
               <Button
                 variant="ghost"
