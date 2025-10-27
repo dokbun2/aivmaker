@@ -370,7 +370,7 @@ export function PromptGenerator() {
               </div>
 
               {/* Buttons */}
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center mb-4 sm:mb-6">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center mb-3 sm:mb-4">
                 <Button
                   onClick={generateImagePrompt}
                   className="bg-white text-black hover:bg-white/90 w-full sm:w-auto"
@@ -389,7 +389,7 @@ export function PromptGenerator() {
               </div>
 
               {/* Result */}
-              <div className="bg-white/5 rounded-lg border border-white/10 p-3 sm:p-5">
+              <div className="bg-white/5 rounded-lg border border-white/10 p-2 sm:p-3 md:p-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
                   <h3 className="text-sm font-semibold">생성된 프롬프트</h3>
                   <Button
@@ -623,7 +623,7 @@ export function PromptGenerator() {
               </div>
 
               {/* Buttons */}
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center mb-4 sm:mb-6">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center mb-3 sm:mb-4">
                 <Button
                   onClick={generateVideoPrompt}
                   className="bg-white text-black hover:bg-white/90 w-full sm:w-auto"
@@ -642,7 +642,7 @@ export function PromptGenerator() {
               </div>
 
               {/* Result */}
-              <div className="bg-white/5 rounded-lg border border-white/10 p-3 sm:p-5">
+              <div className="bg-white/5 rounded-lg border border-white/10 p-2 sm:p-3 md:p-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
                   <h3 className="text-sm font-semibold">생성된 프롬프트</h3>
                   <Button
