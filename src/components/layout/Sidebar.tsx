@@ -16,11 +16,13 @@ interface SidebarProps {
   showFrameExtractor: boolean
   onMultiDownloaderToggle: () => void
   showMultiDownloader: boolean
+  onPromptGeneratorToggle: () => void
+  showPromptGenerator: boolean
 }
 
-type TabType = 'start' | 'project' | 'visual' | 'nano' | 'frameExtractor' | 'multiDownloader'
+type TabType = 'start' | 'project' | 'visual' | 'nano' | 'frameExtractor' | 'multiDownloader' | 'promptGenerator'
 
-export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, onStartToggle, showStart, onVisualConceptToggle, showVisualConcept, onFrameExtractorToggle, showFrameExtractor, onMultiDownloaderToggle, showMultiDownloader }: SidebarProps) {
+export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, onStartToggle, showStart, onVisualConceptToggle, showVisualConcept, onFrameExtractorToggle, showFrameExtractor, onMultiDownloaderToggle, showMultiDownloader, onPromptGeneratorToggle, showPromptGenerator }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<TabType>('start')
   const [freeToolsOpen, setFreeToolsOpen] = useState(false)
   return (
@@ -184,10 +186,31 @@ export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, o
                         if (showVisualConcept) onVisualConceptToggle()
                         if (showNanoStudio) onNanoStudioToggle()
                         if (showFrameExtractor) onFrameExtractorToggle()
+                        if (showPromptGenerator) onPromptGeneratorToggle()
                         if (!showMultiDownloader) onMultiDownloaderToggle()
                       }}
                     >
                       미드저니 다운
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        "w-full justify-start rounded-full text-sm transition-all",
+                        showPromptGenerator
+                          ? "bg-red-900/50 text-white hover:bg-red-900/70"
+                          : "hover:bg-white/10 text-foreground"
+                      )}
+                      onClick={() => {
+                        setActiveTab('promptGenerator')
+                        if (showStart) onStartToggle()
+                        if (showVisualConcept) onVisualConceptToggle()
+                        if (showNanoStudio) onNanoStudioToggle()
+                        if (showFrameExtractor) onFrameExtractorToggle()
+                        if (showMultiDownloader) onMultiDownloaderToggle()
+                        if (!showPromptGenerator) onPromptGeneratorToggle()
+                      }}
+                    >
+                      프롬프트생성기
                     </Button>
                   </div>
                 )}

@@ -4,6 +4,7 @@ import { Sidebar } from './components/layout/Sidebar'
 import { ProjectManager } from './components/project/ProjectManager'
 import { VisualConceptTabs } from './components/project/VisualConceptTabs'
 import { MultiDownloader } from './components/project/MultiDownloader'
+import { PromptGenerator } from './components/project/PromptGenerator'
 
 interface PromptStructure {
   subject?: string
@@ -168,6 +169,7 @@ function App() {
   const [showVisualConcept, setShowVisualConcept] = useState(false)
   const [showFrameExtractor, setShowFrameExtractor] = useState(false)
   const [showMultiDownloader, setShowMultiDownloader] = useState(false)
+  const [showPromptGenerator, setShowPromptGenerator] = useState(false)
   const [, setNanoStudioError] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -254,6 +256,7 @@ function App() {
           setShowVisualConcept(false)
           setShowFrameExtractor(false)
           setShowMultiDownloader(false)
+          setShowPromptGenerator(false)
         } catch (error) {
           alert('JSON 파일 파싱 오류: ' + (error as Error).message)
         }
@@ -364,6 +367,7 @@ function App() {
       setShowVisualConcept(false)
       setShowFrameExtractor(false)
       setShowMultiDownloader(false)
+      setShowPromptGenerator(false)
     }
   }
 
@@ -447,6 +451,8 @@ function App() {
         showFrameExtractor={showFrameExtractor}
         onMultiDownloaderToggle={() => setShowMultiDownloader(!showMultiDownloader)}
         showMultiDownloader={showMultiDownloader}
+        onPromptGeneratorToggle={() => setShowPromptGenerator(!showPromptGenerator)}
+        showPromptGenerator={showPromptGenerator}
       />
 
       {/* Main Content */}
@@ -503,6 +509,10 @@ function App() {
         ) : showMultiDownloader ? (
           <div className="w-full h-[calc(100vh-4rem)]">
             <MultiDownloader />
+          </div>
+        ) : showPromptGenerator ? (
+          <div className="w-full h-[calc(100vh-4rem)] overflow-y-auto">
+            <PromptGenerator />
           </div>
         ) : (
           <div className="p-2 lg:p-4">
