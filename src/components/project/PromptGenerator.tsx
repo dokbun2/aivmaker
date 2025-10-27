@@ -156,7 +156,7 @@ export function PromptGenerator() {
             <div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
                 {/* Subject */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">주제/피사체</label>
                   <select
                     value={imgSubject}
@@ -186,7 +186,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Action */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">액션/포즈</label>
                   <select
                     value={imgAction}
@@ -213,7 +213,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Environment */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">환경/배경</label>
                   <select
                     value={imgEnvironment}
@@ -241,7 +241,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Lighting */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">조명</label>
                   <select
                     value={imgLighting}
@@ -269,7 +269,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Camera */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">카메라 앵글</label>
                   <select
                     value={imgCamera}
@@ -295,7 +295,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Style */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">스타일/무드</label>
                   <select
                     value={imgStyle}
@@ -322,7 +322,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Color */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">색감/톤</label>
                   <select
                     value={imgColor}
@@ -347,7 +347,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Quality */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">품질</label>
                   <select
                     value={imgQuality}
@@ -390,7 +390,7 @@ export function PromptGenerator() {
 
               {/* Result */}
               <div className="bg-white/5 rounded-lg border border-white/10 p-2 sm:p-3 md:p-4">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
                   <h3 className="text-sm font-semibold">생성된 프롬프트</h3>
                   <Button
                     onClick={() => copyToClipboard(imgResult)}
@@ -413,10 +413,10 @@ export function PromptGenerator() {
           ) : (
             <div>
               {/* Camera Movement Section */}
-              <h3 className="text-sm font-semibold mb-3 sm:mb-4">카메라 움직임</h3>
+              <h3 className="text-sm font-semibold mb-2 sm:mb-3">카메라 움직임</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
                 {/* Movement */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">줌/이동</label>
                   <select
                     value={vidMovement}
@@ -432,7 +432,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Rotation */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">회전</label>
                   <select
                     value={vidRotation}
@@ -448,7 +448,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Parallel */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">평행 이동</label>
                   <select
                     value={vidParallel}
@@ -464,7 +464,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Special */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">특수 효과</label>
                   <select
                     value={vidSpecial}
@@ -482,7 +482,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Speed */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">속도/스타일</label>
                   <select
                     value={vidSpeed}
@@ -500,13 +500,13 @@ export function PromptGenerator() {
                 </div>
               </div>
 
-              <hr className="border-white/10 my-4 sm:my-6" />
+              <hr className="border-white/10 my-3 sm:my-4" />
 
               {/* Scene Composition */}
-              <h3 className="text-sm font-semibold mb-3 sm:mb-4">장면 구성</h3>
+              <h3 className="text-sm font-semibold mb-2 sm:mb-3">장면 구성</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mb-3 sm:mb-4">
                 {/* Subject */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">주제/피사체</label>
                   <select
                     value={vidSubject}
@@ -532,7 +532,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Action */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">액션/포즈</label>
                   <select
                     value={vidAction}
@@ -552,7 +552,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Environment */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">환경/배경</label>
                   <select
                     value={vidEnvironment}
@@ -571,7 +571,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Lighting */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">조명</label>
                   <select
                     value={vidLighting}
@@ -589,7 +589,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Style */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">스타일/무드</label>
                   <select
                     value={vidStyle}
@@ -607,7 +607,7 @@ export function PromptGenerator() {
                 </div>
 
                 {/* Quality */}
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className="text-xs text-white/60 font-medium">품질</label>
                   <select
                     value={vidQuality}
@@ -643,7 +643,7 @@ export function PromptGenerator() {
 
               {/* Result */}
               <div className="bg-white/5 rounded-lg border border-white/10 p-2 sm:p-3 md:p-4">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
                   <h3 className="text-sm font-semibold">생성된 프롬프트</h3>
                   <Button
                     onClick={() => copyToClipboard(vidResult)}
@@ -669,7 +669,7 @@ export function PromptGenerator() {
 
       {/* Toast */}
       {showToast && (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 left-4 sm:left-auto bg-white/10 backdrop-blur-xl border border-white/20 text-white px-4 sm:px-5 py-3 sm:py-3.5 rounded-lg flex items-center gap-2.5 shadow-2xl animate-in fade-in slide-in-from-bottom-5">
+        <div className="fixed bottom-3 right-3 sm:bottom-4 sm:right-4 left-3 sm:left-auto bg-white/10 backdrop-blur-xl border border-white/20 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg flex items-center gap-2 shadow-2xl animate-in fade-in slide-in-from-bottom-5">
           <CheckCircle className="w-4.5 h-4.5" />
           <span className="text-sm">복사되었습니다!</span>
         </div>
