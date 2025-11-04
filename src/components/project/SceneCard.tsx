@@ -362,6 +362,7 @@ function FramePage({
                 className="w-full h-full"
                 title="AI Prompt Assistant"
                 style={{ backgroundColor: 'transparent' }}
+                allow="clipboard-write"
               />
             </div>
           </div>
