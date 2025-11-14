@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Film, X, Sparkles, Home, Palette, Image, ChevronDown, ChevronUp, Wand2 } from 'lucide-react'
+import { Film, X, Sparkles, Home, Palette, Image, ChevronDown, ChevronUp, Wand2, FileJson } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -67,6 +67,7 @@ export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, o
                   if (showNanoStudio) onNanoStudioToggle()
                   if (showVisualConcept) onVisualConceptToggle()
                   if (showFrameExtractor) onFrameExtractorToggle()
+                  onClose()
                 }}
               >
                 <Home className="h-4 w-4 mr-2" />
@@ -86,6 +87,7 @@ export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, o
                   if (showNanoStudio) onNanoStudioToggle()
                   if (showVisualConcept) onVisualConceptToggle()
                   if (showFrameExtractor) onFrameExtractorToggle()
+                  onClose()
                 }}
               >
                 <Film className="h-4 w-4 mr-2" />
@@ -105,6 +107,7 @@ export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, o
                   if (showNanoStudio) onNanoStudioToggle()
                   if (showFrameExtractor) onFrameExtractorToggle()
                   if (!showVisualConcept) onVisualConceptToggle()
+                  onClose()
                 }}
               >
                 <Palette className="h-4 w-4 mr-2" />
@@ -124,6 +127,7 @@ export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, o
                   if (showVisualConcept) onVisualConceptToggle()
                   if (showFrameExtractor) onFrameExtractorToggle()
                   if (!showNanoStudio) onNanoStudioToggle()
+                  onClose()
                 }}
               >
                 <Sparkles className="h-4 w-4 mr-2" />
@@ -143,10 +147,22 @@ export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, o
                   if (showVisualConcept) onVisualConceptToggle()
                   if (showNanoStudio) onNanoStudioToggle()
                   if (!showFrameExtractor) onFrameExtractorToggle()
+                  onClose()
                 }}
               >
                 <Image className="h-4 w-4 mr-2" />
                 툴비추출기
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start rounded-full hover:bg-white/10 text-foreground"
+                onClick={() => {
+                  window.open('https://json.aitoolb.com/', '_blank')
+                  onClose()
+                }}
+              >
+                <FileJson className="h-4 w-4 mr-2" />
+                Json에디터
               </Button>
 
               {/* 무료툴 드롭다운 */}
@@ -168,7 +184,10 @@ export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, o
                     <Button
                       variant="ghost"
                       className="w-full justify-start rounded-full hover:bg-white/10 text-foreground text-sm"
-                      onClick={() => window.open('https://img-fx.com/ai-image-upscaler', '_blank')}
+                      onClick={() => {
+                        window.open('https://img-fx.com/ai-image-upscaler', '_blank')
+                        onClose()
+                      }}
                     >
                       업스케일러
                     </Button>
@@ -188,6 +207,7 @@ export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, o
                         if (showFrameExtractor) onFrameExtractorToggle()
                         if (showPromptGenerator) onPromptGeneratorToggle()
                         if (!showMultiDownloader) onMultiDownloaderToggle()
+                        onClose()
                       }}
                     >
                       미드저니 다운
@@ -208,6 +228,7 @@ export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, o
                         if (showFrameExtractor) onFrameExtractorToggle()
                         if (showMultiDownloader) onMultiDownloaderToggle()
                         if (!showPromptGenerator) onPromptGeneratorToggle()
+                        onClose()
                       }}
                     >
                       프롬프트생성기
