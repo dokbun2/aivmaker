@@ -78,58 +78,62 @@ export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, scr
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 h-16 border-b border-white/10 backdrop-blur-xl bg-background/80">
-        <div className="h-full px-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="h-full px-3 sm:px-6 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Button
               variant="ghost"
               size="icon"
               onClick={onMenuClick}
-              className="lg:hidden"
+              className="lg:hidden h-8 w-8 sm:h-10 sm:w-10"
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
 
-            <a href="/" className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-              <img src="/logo.png" alt="Logo" className="w-8 h-8 rounded-lg" />
+            <a href="/" className="flex items-center gap-2 sm:gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+              <img src="/logo.png" alt="Logo" className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg" />
               <div>
-                <h1 className="text-lg font-semibold">AI툴비</h1>
+                <h1 className="text-sm sm:text-base md:text-lg font-semibold">AI툴비</h1>
               </div>
             </a>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-2 md:gap-3">
             {scenario && (
               <Button
                 variant="outline"
                 onClick={() => setShowScenario(true)}
-                className="rounded-full border-white/20 hover:bg-white/10"
+                className="rounded-full border-white/20 hover:bg-white/10 h-8 sm:h-9 md:h-10 px-2 sm:px-3 md:px-4 text-xs sm:text-sm"
+                size="sm"
               >
-                <FileText className="h-4 w-4 mr-2" />
-                시나리오
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1.5 md:mr-2" />
+                <span className="hidden sm:inline">시나리오</span>
               </Button>
             )}
             <Button
               onClick={onUpload}
-              className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg shadow-purple-500/30 transition-all hover:shadow-purple-500/50 hover:scale-105"
+              className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg shadow-purple-500/30 transition-all hover:shadow-purple-500/50 hover:scale-105 h-8 sm:h-9 md:h-10 px-2.5 sm:px-3 md:px-4 text-xs sm:text-sm"
+              size="sm"
             >
-              <Upload className="h-4 w-4 mr-2" />
-              업로드
+              <Upload className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1.5 md:mr-2" />
+              <span className="hidden xs:inline">업로드</span>
             </Button>
             <Button
               onClick={onBackup}
               variant="outline"
-              className="rounded-full border-white/20 hover:bg-white/10"
+              className="rounded-full border-white/20 hover:bg-white/10 h-8 sm:h-9 md:h-10 px-2 sm:px-3 md:px-4 text-xs sm:text-sm"
+              size="sm"
             >
-              <Download className="h-4 w-4 mr-2" />
-              백업
+              <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1.5 md:mr-2" />
+              <span className="hidden sm:inline">백업</span>
             </Button>
             <Button
               onClick={onReset}
               variant="outline"
-              className="rounded-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 transition-all"
+              className="rounded-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 transition-all h-8 sm:h-9 md:h-10 px-2 sm:px-3 md:px-4 text-xs sm:text-sm"
+              size="sm"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              초기화
+              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1.5 md:mr-2" />
+              <span className="hidden sm:inline">초기화</span>
             </Button>
           </div>
         </div>
