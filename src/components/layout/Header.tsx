@@ -111,29 +111,36 @@ export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, scr
             )}
             <Button
               onClick={onUpload}
-              className="rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold shadow-lg shadow-purple-500/30 transition-all hover:shadow-purple-500/50 hover:scale-105 h-8 sm:h-9 md:h-10 px-2.5 sm:px-3 md:px-4 text-xs sm:text-sm"
+              className="group relative flex items-center justify-center rounded-full bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white font-bold shadow-lg shadow-purple-400/50 hover:shadow-xl hover:shadow-pink-400/70 border border-purple-300/30 active:scale-95 hover:scale-[1.02] transition-all duration-300 ease-out h-8 sm:h-9 md:h-10 px-2.5 sm:px-3 md:px-4 text-xs sm:text-sm overflow-hidden"
               size="sm"
             >
-              <Upload className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1.5 md:mr-2" />
-              <span className="hidden xs:inline">업로드</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+              <span className="relative flex items-center justify-center gap-1.5 sm:gap-2">
+                <Upload className="h-3 w-3 sm:h-4 sm:w-4 group-hover:-translate-y-0.5 transition-transform duration-300" />
+                <span className="hidden xs:inline">업로드</span>
+              </span>
             </Button>
             <Button
               onClick={onBackup}
-              variant="outline"
-              className="rounded-full border-white/20 hover:bg-white/10 h-8 sm:h-9 md:h-10 px-2 sm:px-3 md:px-4 text-xs sm:text-sm"
+              className="group relative flex items-center justify-center rounded-full bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-400 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white font-bold shadow-lg shadow-blue-400/50 hover:shadow-xl hover:shadow-cyan-400/70 border border-blue-300/30 active:scale-95 hover:scale-[1.02] transition-all duration-300 ease-out h-8 sm:h-9 md:h-10 px-2.5 sm:px-3 md:px-4 text-xs sm:text-sm overflow-hidden"
               size="sm"
             >
-              <Download className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1.5 md:mr-2" />
-              <span className="hidden sm:inline">백업</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+              <span className="relative flex items-center justify-center gap-1.5 sm:gap-2">
+                <Download className="h-3 w-3 sm:h-4 sm:w-4 group-hover:translate-y-0.5 transition-transform duration-300" />
+                <span className="hidden sm:inline">백업</span>
+              </span>
             </Button>
             <Button
               onClick={onReset}
-              variant="outline"
-              className="rounded-full border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 transition-all h-8 sm:h-9 md:h-10 px-2 sm:px-3 md:px-4 text-xs sm:text-sm"
+              className="group relative flex items-center justify-center rounded-full bg-gradient-to-r from-red-400 via-orange-400 to-red-400 bg-size-200 bg-pos-0 hover:bg-pos-100 text-white font-bold shadow-lg shadow-red-400/50 hover:shadow-xl hover:shadow-orange-400/70 border border-red-300/30 active:scale-95 hover:scale-[1.02] transition-all duration-300 ease-out h-8 sm:h-9 md:h-10 px-2.5 sm:px-3 md:px-4 text-xs sm:text-sm overflow-hidden"
               size="sm"
             >
-              <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1.5 md:mr-2" />
-              <span className="hidden sm:inline">초기화</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/30 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+              <span className="relative flex items-center justify-center gap-1.5 sm:gap-2">
+                <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 group-hover:rotate-180 transition-transform duration-500" />
+                <span className="hidden sm:inline">초기화</span>
+              </span>
             </Button>
           </div>
         </div>

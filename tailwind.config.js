@@ -50,6 +50,13 @@ export default {
       backdropBlur: {
         xs: '2px',
       },
+      backgroundSize: {
+        '200': '200%',
+      },
+      backgroundPosition: {
+        '0': '0%',
+        '100': '100%',
+      },
     },
   },
   plugins: [],
