@@ -5,6 +5,7 @@ import { ProjectManager } from './components/project/ProjectManager'
 import { VisualConceptTabs } from './components/project/VisualConceptTabs'
 import { MultiDownloader } from './components/project/MultiDownloader'
 import { PromptGenerator } from './components/project/PromptGenerator'
+import { PasswordModal } from './components/auth/PasswordModal'
 
 interface PromptStructure {
   subject?: string
@@ -162,6 +163,10 @@ function convertShotsToFrames(data: ProjectData): ProjectData {
 }
 
 function App() {
+  const [isPasswordAuthenticated, setIsPasswordAuthenticated] = useState(() => {
+    // 앱 로드 시 localStorage에서 인증 상태 확인
+    return localStorage.getItem('passwordAuthenticated') === 'true'
+  })
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [projectData, setProjectData] = useState<ProjectData | null>(null)
   const [showNanoStudio, setShowNanoStudio] = useState(false)
@@ -414,6 +419,11 @@ function App() {
   //       scenesCount: projectData.scenes?.length || 0,
   //     }
   //   : undefined
+
+  // 비밀번호 인증 전이면 모달만 표시
+  if (!isPasswordAuthenticated) {
+    return <PasswordModal onSuccess={() => setIsPasswordAuthenticated(true)} />
+  }
 
   return (
     <div className="min-h-screen bg-black">
