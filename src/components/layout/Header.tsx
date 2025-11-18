@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Menu, Upload, FileText, X, RefreshCw, ChevronDown, Download } from 'lucide-react'
+import { Menu, Upload, FileText, X, RefreshCw, Download, Copy, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface Motion {
@@ -61,18 +61,81 @@ interface HeaderProps {
 
 export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, script, scenes }: HeaderProps) {
   const [showScenario, setShowScenario] = useState(false)
-  const [expandedScenes, setExpandedScenes] = useState<Set<number>>(new Set())
+  const [copied, setCopied] = useState(false)
 
-  const toggleScene = (index: number) => {
-    setExpandedScenes(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(index)) {
-        newSet.delete(index)
-      } else {
-        newSet.add(index)
+  // 시나리오 텍스트 추출 함수
+  const extractScenarioText = () => {
+    let text = ''
+
+    // 시나리오 개요
+    if (scenario && typeof scenario === 'object') {
+      if (scenario.logline) {
+        text += scenario.logline + '\n\n'
       }
-      return newSet
-    })
+      if (scenario.synopsis) {
+        text += scenario.synopsis + '\n\n'
+      }
+      if (scenario.treatment) {
+        text += scenario.treatment + '\n\n'
+      }
+    } else if (typeof scenario === 'string') {
+      text += scenario + '\n\n'
+    }
+
+    // 대본
+    if (script) {
+      text += script + '\n\n'
+    }
+
+    // 씬별 구성
+    if (scenes && scenes.length > 0) {
+      scenes.forEach((scene) => {
+        if (scene.title) text += scene.title + '\n'
+        if (scene.description) text += scene.description + '\n'
+
+        const frames = scene.frames || scene.shots
+        if (frames) {
+          ;['start', 'middle', 'end'].forEach((frameType) => {
+            const frame = frames[frameType as keyof typeof frames]
+            if (frame && frame.description) {
+              text += frame.description + '\n'
+            }
+          })
+        }
+        text += '\n'
+      })
+    }
+
+    return text.trim()
+  }
+
+  // 복사 함수
+  const handleCopy = () => {
+    const text = extractScenarioText()
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  // 다운로드 함수
+  const handleDownload = () => {
+    const text = extractScenarioText()
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+
+    // 파일명 생성 (시나리오 제목 또는 기본값)
+    let filename = 'scenario.txt'
+    if (scenario && typeof scenario === 'object' && scenario.title) {
+      filename = `${scenario.title}_시나리오.txt`
+    }
+
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   return (
@@ -155,45 +218,74 @@ export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, scr
           />
           <div className="relative bg-card border border-white/20 rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
-              <h2 className="text-xl font-semibold">시나리오</h2>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowScenario(false)}
-                className="hover:bg-red-500/10 hover:text-red-500 transition-colors rounded-full"
-              >
-                <X className="h-5 w-5" />
-              </Button>
+            <div className="flex items-center justify-between px-6 py-3 border-b border-white/10">
+              <h2 className="text-lg font-semibold">시나리오</h2>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleCopy}
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full border-white/20 hover:bg-white/10"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2" />
+                      <span className="hidden sm:inline">복사됨</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 sm:mr-2" />
+                      <span className="hidden sm:inline">복사</span>
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={handleDownload}
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full border-white/20 hover:bg-white/10"
+                >
+                  <Download className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">다운로드</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowScenario(false)}
+                  className="hover:bg-red-500/10 hover:text-red-500 transition-colors rounded-full"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
 
             {/* Content - 단일 탭으로 통합 */}
-            <div className="p-8 overflow-y-auto max-h-[calc(90vh-8rem)]">
-              <div className="space-y-8">
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-6rem)]">
+              <div className="space-y-6">
                 {/* 시나리오 개요 섹션 */}
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-bold text-primary border-b border-primary/30 pb-3">시나리오 개요</h3>
-                  <div className="text-lg leading-[2] font-sans text-foreground space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-primary border-b border-primary/30 pb-2">시나리오 개요</h3>
+                  <div className="text-sm leading-relaxed font-sans text-foreground space-y-4">
                     {(() => {
                       // scenario가 객체인 경우
                       if (scenario && typeof scenario === 'object') {
                         return (
                           <>
                             {scenario.logline && (
-                              <div className="p-6 rounded-xl bg-primary/10 border border-primary/30">
-                                <p className="text-xl font-bold text-primary mb-3">로그라인</p>
-                                <p className="text-foreground/90">{scenario.logline}</p>
+                              <div className="p-4 rounded-lg bg-primary/10 border border-primary/30">
+                                <p className="text-sm font-bold text-primary mb-2">로그라인</p>
+                                <p className="text-sm text-foreground/90">{scenario.logline}</p>
                               </div>
                             )}
                             {scenario.synopsis && (
-                              <div className="p-6 rounded-xl bg-white/5 border border-white/10">
-                                <p className="text-xl font-bold text-primary mb-3">시놉시스</p>
-                                <p className="text-foreground/90">{scenario.synopsis}</p>
+                              <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                                <p className="text-sm font-bold text-primary mb-2">시놉시스</p>
+                                <p className="text-sm text-foreground/90">{scenario.synopsis}</p>
                               </div>
                             )}
                             {scenario.treatment && (
-                              <div className="space-y-4">
-                                <p className="text-xl font-bold text-primary">트리트먼트</p>
+                              <div className="space-y-3">
+                                <p className="text-sm font-bold text-primary">트리트먼트</p>
                                 {(() => {
                                   // treatment를 막 단위로 분리
                                   const treatmentText = scenario.treatment
@@ -219,9 +311,9 @@ export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, scr
                                       // 다음 부분이 막 내용
                                       const actContent = parts[i + 1]?.trim() || ''
                                       elements.push(
-                                        <div key={`act-${i}`} className="p-6 rounded-xl bg-white/5 border border-white/10">
-                                          <p className="text-lg font-bold text-primary mb-3">{part}</p>
-                                          <p className="text-foreground/90">{actContent}</p>
+                                        <div key={`act-${i}`} className="p-4 rounded-lg bg-white/5 border border-white/10">
+                                          <p className="text-sm font-bold text-primary mb-2">{part}</p>
+                                          <p className="text-sm text-foreground/90">{actContent}</p>
                                         </div>
                                       )
                                       i++ // 다음 부분은 이미 처리했으므로 스킵
@@ -240,8 +332,8 @@ export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, scr
                                   }
 
                                   return elements.length > 0 ? elements : (
-                                    <div className="p-6 rounded-xl bg-white/5 border border-white/10">
-                                      <p className="text-foreground/90 whitespace-pre-wrap">{treatmentText}</p>
+                                    <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                                      <p className="text-sm text-foreground/90 whitespace-pre-wrap">{treatmentText}</p>
                                     </div>
                                   )
                                 })()}
@@ -275,9 +367,9 @@ export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, scr
                           // 다음 부분이 막 내용
                           const actContent = parts[i + 1]?.trim() || ''
                           elements.push(
-                            <div key={`act-${i}`} className="p-6 rounded-xl bg-white/5 border border-white/10">
-                              <p className="text-xl font-bold text-primary mb-3">{part}</p>
-                              <p className="text-foreground/90">{actContent}</p>
+                            <div key={`act-${i}`} className="p-4 rounded-lg bg-white/5 border border-white/10">
+                              <p className="text-sm font-bold text-primary mb-2">{part}</p>
+                              <p className="text-sm text-foreground/90">{actContent}</p>
                             </div>
                           )
                           i++ // 다음 부분은 이미 처리했으므로 스킵
@@ -306,9 +398,9 @@ export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, scr
 
                 {/* 대본 섹션 */}
                 {script && (
-                  <div className="space-y-6">
-                    <h3 className="text-2xl font-bold text-primary border-b border-primary/30 pb-3">영상 대본</h3>
-                    <div className="text-lg leading-[2] whitespace-pre-wrap font-sans text-foreground p-6 rounded-xl bg-white/5 border border-white/10">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-bold text-primary border-b border-primary/30 pb-2">영상 대본</h3>
+                    <div className="text-sm leading-relaxed whitespace-pre-wrap font-sans text-foreground p-4 rounded-lg bg-white/5 border border-white/10">
                       {script}
                     </div>
                   </div>
@@ -316,60 +408,47 @@ export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, scr
 
                 {/* 씬별 구성 섹션 */}
                 {scenes && scenes.length > 0 && (
-                  <div className="space-y-6">
-                    <h3 className="text-2xl font-bold text-primary border-b border-primary/30 pb-3">씬별 구성</h3>
-                    <div className="space-y-4">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-bold text-primary border-b border-primary/30 pb-2">씬별 구성</h3>
+                    <div className="space-y-3">
                       {scenes.map((scene, index) => {
                         const sceneNum = scene.scene || scene.sceneNumber || index + 1
                         const frames = scene.frames || scene.shots
-                        const isExpanded = expandedScenes.has(index)
 
                         return (
-                          <div key={index} className="rounded-xl bg-white/5 border border-white/10 overflow-hidden">
-                            {/* 씬 헤더 - 클릭 가능 */}
-                            <button
-                              onClick={() => toggleScene(index)}
-                              className="w-full p-6 text-left hover:bg-white/5 transition-colors"
-                            >
-                              <div className="flex items-center justify-between gap-4">
-                                <div className="flex items-center gap-4 flex-1 min-w-0">
-                                  <span className="px-4 py-2 rounded-full bg-primary/20 text-primary text-lg font-bold flex-shrink-0">
-                                    Scene {sceneNum}
-                                  </span>
-                                  <div className="flex-1 min-w-0">
-                                    {scene.title && (
-                                      <h4 className="font-bold text-xl text-foreground mb-2">{scene.title}</h4>
-                                    )}
-                                    {scene.description && (
-                                      <p className="text-lg text-foreground/70 leading-relaxed line-clamp-2">
-                                        {scene.description}
-                                      </p>
-                                    )}
-                                  </div>
-                                </div>
-                                <ChevronDown
-                                  className={`w-6 h-6 text-primary flex-shrink-0 transition-transform duration-200 ${
-                                    isExpanded ? 'rotate-180' : ''
-                                  }`}
-                                />
+                          <div key={index} className="rounded-lg bg-white/5 border border-white/10 p-4">
+                            {/* 씬 헤더 */}
+                            <div className="flex items-center gap-3 mb-3">
+                              <span className="px-3 py-1 rounded-full bg-primary/20 text-primary text-sm font-bold flex-shrink-0">
+                                Scene {sceneNum}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                {scene.title && (
+                                  <h4 className="font-bold text-sm text-foreground">{scene.title}</h4>
+                                )}
+                                {scene.description && (
+                                  <p className="text-sm text-foreground/70 leading-relaxed">
+                                    {scene.description}
+                                  </p>
+                                )}
                               </div>
-                            </button>
+                            </div>
 
-                            {/* 씬 내용 흐름 - 펼쳐질 때만 표시 */}
-                            {isExpanded && frames && (
-                              <div className="px-6 pb-6 pt-2 border-t border-white/10">
-                                <div className="space-y-5 pl-4 border-l-2 border-primary/20">
+                            {/* 씬 내용 흐름 - 항상 표시 */}
+                            {frames && (
+                              <div className="pl-3 border-l-2 border-primary/20">
+                                <div className="space-y-3">
                                   {['start', 'middle', 'end'].map((frameType, idx) => {
                                     const frame = frames[frameType as keyof typeof frames]
                                     if (!frame || !frame.description) return null
 
                                     return (
-                                      <div key={frameType} className="flex gap-4">
-                                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
-                                          <span className="text-base font-bold text-primary">{idx + 1}</span>
+                                      <div key={frameType} className="flex gap-3">
+                                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30">
+                                          <span className="text-xs font-bold text-primary">{idx + 1}</span>
                                         </div>
-                                        <div className="flex-1 pt-1">
-                                          <p className="text-lg text-foreground/80 leading-relaxed">
+                                        <div className="flex-1">
+                                          <p className="text-sm text-foreground/80 leading-relaxed">
                                             {frame.description}
                                           </p>
                                         </div>

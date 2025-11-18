@@ -281,16 +281,16 @@ function FramePage({
     <div className="space-y-6">
       {/* 상단: 프레임 정보 */}
       <div className="space-y-4">
-        <div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <div className={cn(
-            "inline-flex items-center gap-2 px-3 py-1 rounded-full border text-sm font-medium",
+            "inline-flex items-center gap-2 px-3 py-1 rounded-full border text-sm font-medium shrink-0",
             FRAME_COLORS[type]
           )}>
             {FRAME_LABELS[type]} 프레임
           </div>
 
           {frame.description && (
-            <p className="text-sm text-muted-foreground mt-4">{frame.description}</p>
+            <p className="text-sm text-muted-foreground">{frame.description}</p>
           )}
         </div>
 
