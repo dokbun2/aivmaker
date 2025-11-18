@@ -483,73 +483,81 @@ function App() {
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 flex items-center justify-center md:mt-80 mt-40">
-              <div className="relative w-[90vw] max-w-[440px] h-[75vw] max-h-[360px]">
+              <div className="relative w-[90vw] max-w-[600px] h-[60vw] max-h-[300px]">
                 {/* START 버튼 (상단 중앙) */}
                 <a
                   href="https://gemini.google.com/gem/1zximT5wRr3zL-y3D_4HKAL909Bzwy8I0?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-1/2 -translate-x-1/2 top-0 w-[35%] h-[38%]"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-1/2 -translate-x-1/2 top-0 w-[28%] h-[45%]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
                     <polygon
                       points="80,0 160,34.5 160,103.5 80,138 0,103.5 0,34.5"
                       fill="rgba(127, 29, 29, 0.85)"
+                      stroke="gray"
+                      strokeWidth="2"
                       className="transition-all duration-300"
                     />
                   </svg>
                   <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-base sm:text-xl md:text-2xl pointer-events-none">START</span>
                 </a>
 
-                {/* 이미지 생성 버튼 (중단 좌측) */}
+                {/* 이미지 생성 버튼 (하단 왼쪽) */}
                 <a
                   href="https://gemini.google.com/gem/17YwS4g-YuAFYoTyfnO78064pVVYS-lbY?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[13.5%] top-[30.8%] w-[35%] h-[38%]"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[22%] top-[37%] w-[28%] h-[45%]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
                     <polygon
                       points="80,0 160,34.5 160,103.5 80,138 0,103.5 0,34.5"
                       fill="rgba(234, 179, 8, 0.85)"
+                      stroke="gray"
+                      strokeWidth="2"
                       className="transition-all duration-300"
                     />
                   </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm sm:text-base md:text-xl pointer-events-none">이미지 생성</span>
+                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-xs sm:text-sm md:text-lg pointer-events-none">이미지 생성</span>
                 </a>
 
-                {/* 영상 생성 버튼 (중단 우측) */}
+                {/* 영상 생성 버튼 (하단 중앙) */}
                 <a
                   href="https://gemini.google.com/gem/1GMqeS_7sP_v1RUx5OFcSU0vRvXKYZcrf?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[51.5%] top-[30.8%] w-[35%] h-[38%]"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[64%] -translate-x-1/2 top-[37%] w-[28%] h-[45%]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
                     <polygon
                       points="80,0 160,34.5 160,103.5 80,138 0,103.5 0,34.5"
                       fill="rgba(234, 179, 8, 0.85)"
+                      stroke="gray"
+                      strokeWidth="2"
                       className="transition-all duration-300"
                     />
                   </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm sm:text-base md:text-xl pointer-events-none">영상 생성</span>
+                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-xs sm:text-sm md:text-lg pointer-events-none">영상 생성</span>
                 </a>
 
-                {/* 음악생성기 버튼 (하단 중앙) */}
+                {/* 음악생성기 버튼 (하단 오른쪽) */}
                 <a
                   href="https://gemini.google.com/gem/1s8f2dOr9ZGwCBrOWwbeW-8kZ3_qK-AqP?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-1/2 -translate-x-1/2 top-[61.6%] w-[35%] h-[38%]"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[78%] top-[37%] w-[28%] h-[45%]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
                     <polygon
                       points="80,0 160,34.5 160,103.5 80,138 0,103.5 0,34.5"
-                      fill="rgba(127, 29, 29, 0.85)"
+                      fill="rgba(234, 179, 8, 0.85)"
+                      stroke="gray"
+                      strokeWidth="2"
                       className="transition-all duration-300"
                     />
                   </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-sm sm:text-base md:text-xl pointer-events-none">음악생성기</span>
+                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-xs sm:text-sm md:text-lg pointer-events-none">음악생성기</span>
                 </a>
               </div>
             </div>
