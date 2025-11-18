@@ -371,7 +371,7 @@ function FramePage({
             </div>
             <div className="rounded-lg border border-white/10 overflow-hidden h-[400px] lg:h-[350px] bg-black/20">
               <iframe
-                src="https://prompt-transformation-chat-252213558759.us-west1.run.app"
+                src="https://promptchat-zeta.vercel.app/"
                 className="w-full h-full"
                 title="AI Prompt Assistant"
                 style={{ backgroundColor: 'transparent' }}
