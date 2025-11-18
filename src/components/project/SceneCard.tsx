@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { ChevronLeft, ChevronRight, Copy, Check, Edit2, X, Save } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { generateBlockPrompt } from '@/lib/promptBuilder'
 
 interface PromptStructure {
   subject?: string
@@ -77,6 +78,7 @@ interface Scene {
 interface SceneCardProps {
   scene: Scene
   index: number
+  library?: any  // V8 library 지원
 }
 
 type FrameType = 'start' | 'middle' | 'end'
@@ -96,11 +98,13 @@ const FRAME_COLORS: Record<FrameType, string> = {
 function FramePage({
   frame,
   type,
-  sceneId
+  sceneId,
+  library
 }: {
   frame: Frame
   type: FrameType
   sceneId: string
+  library?: any
 }) {
   const [isEditingPrompt, setIsEditingPrompt] = useState(false)
   const [editedPrompt, setEditedPrompt] = useState('')
@@ -127,6 +131,15 @@ function FramePage({
   const displayPrompt = (() => {
     const cachedPrompt = localStorage.getItem(`frame_prompt_${sceneId}_${type}`)
     if (cachedPrompt) return cachedPrompt
+
+    // V8 포맷 체크 (promptBlock이 있는지 확인)
+    if ((frame as any).promptBlock && library) {
+      try {
+        return generateBlockPrompt(library, (frame as any).promptBlock)
+      } catch (e) {
+        console.error('V8 프롬프트 생성 실패:', e)
+      }
+    }
 
     // prompt가 있으면 그대로 사용
     if (frame.prompt) return frame.prompt
@@ -462,7 +475,7 @@ function FramePage({
   )
 }
 
-export function SceneCard({ scene, index }: SceneCardProps) {
+export function SceneCard({ scene, index, library }: SceneCardProps) {
   const [currentFrame, setCurrentFrame] = useState<FrameType>('start')
   const sceneIdValue = scene.sceneId || scene.id || `scene_${index}`
   const frames = scene.frames || scene.shots
@@ -563,6 +576,7 @@ export function SceneCard({ scene, index }: SceneCardProps) {
               frame={frames[currentFrame]}
               type={currentFrame}
               sceneId={sceneIdValue}
+              library={library}
             />
           )}
         </div>

@@ -80,6 +80,13 @@ interface ProjectData {
     description?: string
   }
   scenes: Scene[]
+  definitions?: {
+    library?: {
+      characters?: Record<string, any>
+      locations?: Record<string, any>
+      props?: Record<string, any>
+    }
+  }
 }
 
 interface ProjectManagerProps {
@@ -239,24 +246,22 @@ export function ProjectManager({ projectData }: ProjectManagerProps) {
       {/* Project Info & Scene Selector - 2 Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Project Info & Description Combined */}
-        <div className="backdrop-blur-xl bg-card/50 border border-white/10 rounded-2xl p-4">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm flex-1">
-              <div className="flex gap-2">
-                <span className="text-muted-foreground">제목:</span>
-                <span className="font-medium">{projectData.project.title}</span>
+        <div className="backdrop-blur-xl bg-card/50 border border-white/10 rounded-2xl p-3">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm flex-1 min-w-0">
+              <div className="flex gap-2 items-center">
+                <span className="text-muted-foreground shrink-0">제목:</span>
+                <span className="font-medium truncate">{projectData.project.title}</span>
               </div>
-              <div className="flex gap-2">
-                <span className="text-muted-foreground">스타일:</span>
-                <span className="font-medium">{projectData.project.style}</span>
-              </div>
-              <div className="flex gap-2">
-                <span className="text-muted-foreground">화면 비율:</span>
-                <span className="font-medium">{projectData.project.aspectRatio}</span>
-              </div>
-              <div className="flex gap-2">
-                <span className="text-muted-foreground">총 길이:</span>
-                <span className="font-medium">{projectData.project.totalDuration}</span>
+              <div className="flex gap-4">
+                <div className="flex gap-2 items-center">
+                  <span className="text-muted-foreground shrink-0">화면 비율:</span>
+                  <span className="font-medium">{projectData.project.aspectRatio}</span>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <span className="text-muted-foreground shrink-0">총 길이:</span>
+                  <span className="font-medium">{projectData.project.totalDuration}</span>
+                </div>
               </div>
             </div>
 
@@ -267,38 +272,32 @@ export function ProjectManager({ projectData }: ProjectManagerProps) {
                 disabled={downloading}
                 variant="outline"
                 size="sm"
-                className="rounded-full border-white/20 hover:bg-white/10"
+                className="rounded-full border-white/20 hover:bg-white/10 flex-1 sm:flex-none"
               >
-                <ImageIcon className="h-4 w-4 mr-2" />
-                이미지 다운
+                <ImageIcon className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">이미지 다운</span>
               </Button>
               <Button
                 onClick={() => downloadMediaAsZip('video')}
                 disabled={downloading}
                 variant="outline"
                 size="sm"
-                className="rounded-full border-white/20 hover:bg-white/10"
+                className="rounded-full border-white/20 hover:bg-white/10 flex-1 sm:flex-none"
               >
-                <Video className="h-4 w-4 mr-2" />
-                비디오 다운
+                <Video className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">비디오 다운</span>
               </Button>
             </div>
           </div>
-          {projectData.project.description && (
-            <div className="pt-3 border-t border-white/10">
-              <p className="text-sm text-muted-foreground">{projectData.project.description}</p>
-            </div>
-          )}
         </div>
 
         {/* Scene Selector Dropdown */}
-        <div className="backdrop-blur-xl bg-card/50 border border-white/10 rounded-2xl p-4">
-          <label className="block text-sm font-medium mb-2">씬 선택</label>
+        <div className="backdrop-blur-xl bg-card/50 border border-white/10 rounded-2xl p-3">
           <div className="relative">
             <select
               value={selectedSceneIndex}
               onChange={(e) => setSelectedSceneIndex(Number(e.target.value))}
-              className="w-full bg-secondary border border-white/20 rounded-lg px-4 py-3 pr-10 text-sm text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer"
+              className="w-full bg-secondary border border-white/20 rounded-lg px-4 py-2 pr-10 text-sm text-foreground appearance-none focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer"
             >
               {projectData.scenes.map((scene, index) => {
                 const sceneNum = scene.scene || scene.sceneNumber || index + 1
@@ -321,7 +320,12 @@ export function ProjectManager({ projectData }: ProjectManagerProps) {
 
       {/* Selected Scene */}
       {currentScene && (
-        <SceneCard key={currentScene.sceneId || currentScene.id || selectedSceneIndex} scene={currentScene} index={selectedSceneIndex} />
+        <SceneCard
+          key={currentScene.sceneId || currentScene.id || selectedSceneIndex}
+          scene={currentScene}
+          index={selectedSceneIndex}
+          library={projectData.definitions?.library}
+        />
       )}
     </div>
   )

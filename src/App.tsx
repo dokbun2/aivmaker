@@ -133,6 +133,14 @@ interface ProjectData {
   characters?: Character[]
   keyProps?: KeyProp[]
   scenes: Scene[]
+  // V8 스키마 추가
+  definitions?: {
+    library?: {
+      characters?: Record<string, any>
+      locations?: Record<string, any>
+      props?: Record<string, any>
+    }
+  }
 }
 
 // shots → frames 변환 헬퍼 함수
@@ -535,6 +543,7 @@ function App() {
               characters={projectData?.characters || []}
               keyProps={projectData?.keyProps || []}
               scenes={projectData?.scenes || []}
+              library={projectData?.definitions?.library}
               onUpdateCharacters={handleUpdateCharacters}
               onUpdateKeyProps={handleUpdateKeyProps}
             />

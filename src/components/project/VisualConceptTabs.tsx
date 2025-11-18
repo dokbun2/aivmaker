@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus, Trash2, User, Copy, Check, MapPin, Package } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { generateBlockPrompt } from '@/lib/promptBuilder'
+import type { Library, PromptBlock } from '@/types/schema'
 
 interface Character {
   id: string
@@ -65,6 +67,7 @@ interface VisualConceptTabsProps {
   characters: Character[]
   keyProps?: KeyProp[]
   scenes?: Scene[]
+  library?: any  // V8 library 지원
   onUpdateCharacters?: (characters: Character[]) => void
   onUpdateKeyProps?: (keyProps: KeyProp[]) => void
 }
@@ -84,6 +87,7 @@ export function VisualConceptTabs({
   characters = [],
   keyProps = [],
   scenes = [],
+  library,
   onUpdateCharacters,
   onUpdateKeyProps
 }: VisualConceptTabsProps) {
@@ -97,28 +101,124 @@ export function VisualConceptTabs({
   const [locationOverrides, setLocationOverrides] = useState<Record<string, LocationData>>({})
   const [fullPromptOverrides, setFullPromptOverrides] = useState<Record<string, string>>({})
 
-  // 첫 번째 아이템 자동 선택
-  useEffect(() => {
-    if (activeTab === 'characters' && characters.length > 0) {
-      const exists = characters.find(c => c.id === selectedId)
-      if (!exists) {
-        setSelectedId(characters[0].id)
+  // V8 데이터를 레거시 포맷으로 변환하는 헬퍼 함수
+  const convertV8ToCharacter = (id: string, data: any): Character & { blocks?: any } => {
+    const blocks = data.blocks || {}
+    return {
+      id,
+      name: data.name || id,
+      role: blocks.genre || '',
+      description: blocks.char_desc || '',
+      visualDescription: Object.entries(blocks)
+        .filter(([key]) => key.startsWith('char_') || key === 'style_main')
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(', '),
+      blocks // V8 blocks 데이터 보존
+    }
+  }
+
+  const convertV8ToKeyProp = (id: string, data: any): KeyProp & { blocks?: any } => {
+    const blocks = data.blocks || {}
+    return {
+      id,
+      name: data.name || id,
+      description: blocks.prop_name || blocks.prop_detail || '',
+      visualDescription: Object.entries(blocks)
+        .filter(([key]) => key.startsWith('prop_'))
+        .map(([key, value]) => `${key}: ${value}`)
+        .join(', '),
+      blocks // V8 blocks 데이터 보존
+    }
+  }
+
+  const convertV8ToLocation = (id: string, data: any): LocationData & { blocks?: any } => {
+    const blocks = data.blocks || {}
+    return {
+      id,
+      scene: 0,
+      title: data.name || id,
+      location: blocks.loc_main || data.name || id,
+      timeOfDay: blocks.loc_light_mood || '',
+      atmosphere: blocks.atmosphere || '',
+      blocks // V8 blocks 데이터 보존
+    }
+  }
+
+  // V8 라이브러리에서 캐릭터와 장소 추출
+  const v8Characters = library?.characters
+    ? Object.entries(library.characters).map(([id, data]: [string, any]) =>
+        convertV8ToCharacter(id, data))
+    : []
+
+  const v8Locations = library?.locations
+    ? Object.entries(library.locations).map(([id, data]: [string, any]) =>
+        convertV8ToLocation(id, data))
+    : []
+
+  const v8Props = library?.props
+    ? Object.entries(library.props).map(([id, data]: [string, any]) =>
+        convertV8ToKeyProp(id, data))
+    : []
+
+  // 레거시와 V8 캐릭터 병합
+  const allCharacters: Character[] = [
+    ...characters,
+    ...v8Characters.filter(v8 => !characters.find(c => c.id === v8.id))
+  ]
+
+  // 레거시와 V8 소품 병합
+  const allKeyProps: KeyProp[] = [
+    ...keyProps,
+    ...v8Props.filter(v8 => !keyProps.find(p => p.id === v8.id))
+  ]
+
+  // 장소 정보 추출 (씬에서 중복 제거) - 오버라이드 적용
+  const locations: LocationData[] = scenes
+    .filter(scene => scene.setting?.location)
+    .map(scene => {
+      const locId = `loc_${scene.sceneId || scene.id || scene.scene || scene.sceneNumber}`
+      const override = locationOverrides[locId]
+
+      return {
+        id: locId,
+        scene: scene.scene || scene.sceneNumber || 0,
+        title: scene.title || '',
+        location: override?.location || scene.setting!.location!,
+        timeOfDay: override?.timeOfDay || scene.setting?.timeOfDay || '',
+        atmosphere: override?.atmosphere || scene.setting?.atmosphere || ''
       }
-    } else if (activeTab === 'keyProps' && keyProps.length > 0) {
-      const exists = keyProps.find(p => p.id === selectedId)
+    })
+    .reduce<LocationData[]>((acc, curr) => {
+      // 중복된 location 제거
+      const exists = acc.find((l: LocationData) => l.location === curr.location)
       if (!exists) {
-        setSelectedId(keyProps[0].id)
+        acc.push(curr)
+      }
+      return acc
+    }, [])
+
+  // 레거시와 V8 장소 병합
+  const allLocations: LocationData[] = [
+    ...locations,
+    ...v8Locations.filter(v8 => !locations.find(l => l.location === v8.location))
+  ]
+
+  // 탭 변경 시 첫 번째 아이템 자동 선택
+  useEffect(() => {
+    if (activeTab === 'characters') {
+      if (allCharacters.length > 0) {
+        setSelectedId(allCharacters[0].id)
+      }
+    } else if (activeTab === 'keyProps') {
+      if (allKeyProps.length > 0) {
+        setSelectedId(allKeyProps[0].id)
       }
     } else if (activeTab === 'locations') {
-      // 장소가 있을 때 첫 번째 선택
-      const locations = scenes
-        .filter(scene => scene.setting?.location)
-        .map(scene => `loc_${scene.sceneId || scene.id || scene.scene || scene.sceneNumber}`)
-      if (locations.length > 0 && !locations.includes(selectedId || '')) {
-        setSelectedId(locations[0])
+      if (allLocations.length > 0) {
+        setSelectedId(allLocations[0].id)
       }
     }
-  }, [activeTab, characters, keyProps, scenes, selectedId])
+  }, [activeTab])
 
   // localStorage에서 이미지와 장소 데이터 로드
   useEffect(() => {
@@ -165,31 +265,6 @@ export function VisualConceptTabs({
     setLocationOverrides(locOverrides)
     setFullPromptOverrides(fullPrompts)
   }, [characters, keyProps, scenes])
-
-  // 장소 정보 추출 (씬에서 중복 제거) - 오버라이드 적용
-  const locations: LocationData[] = scenes
-    .filter(scene => scene.setting?.location)
-    .map(scene => {
-      const locId = `loc_${scene.sceneId || scene.id || scene.scene || scene.sceneNumber}`
-      const override = locationOverrides[locId]
-
-      return {
-        id: locId,
-        scene: scene.scene || scene.sceneNumber || 0,
-        title: scene.title || '',
-        location: override?.location || scene.setting!.location!,
-        timeOfDay: override?.timeOfDay || scene.setting?.timeOfDay || '',
-        atmosphere: override?.atmosphere || scene.setting?.atmosphere || ''
-      }
-    })
-    .reduce<LocationData[]>((acc, curr) => {
-      // 중복된 location 제거
-      const exists = acc.find((l: LocationData) => l.location === curr.location)
-      if (!exists) {
-        acc.push(curr)
-      }
-      return acc
-    }, [])
 
   const handleAddCharacter = () => {
     if (!onUpdateCharacters) return
@@ -254,29 +329,6 @@ export function VisualConceptTabs({
     ))
   }
 
-  const handleUpdateLocation = (id: string, field: keyof LocationData, value: string) => {
-    const updatedLocation = {
-      ...locations.find(l => l.id === id)!,
-      [field]: value
-    }
-
-    setLocationOverrides(prev => ({
-      ...prev,
-      [id]: updatedLocation
-    }))
-
-    localStorage.setItem(`location_data_${id}`, JSON.stringify(updatedLocation))
-  }
-
-  const handleUpdateFullPrompt = (id: string, value: string) => {
-    setFullPromptOverrides(prev => ({
-      ...prev,
-      [id]: value
-    }))
-
-    localStorage.setItem(`location_full_prompt_${id}`, value)
-  }
-
   const handleImageUrlChange = (type: 'character' | 'keyprop' | 'location', id: string, url: string) => {
     if (type === 'character') {
       setCharacterImages(prev => ({ ...prev, [id]: url }))
@@ -297,9 +349,15 @@ export function VisualConceptTabs({
   }
 
   // 현재 탭에 따른 선택된 아이템
-  const selectedCharacter = activeTab === 'characters' ? characters.find(c => c.id === selectedId) : null
-  const selectedKeyProp = activeTab === 'keyProps' ? keyProps.find(p => p.id === selectedId) : null
-  const selectedLocation = activeTab === 'locations' ? locations.find(l => l.id === selectedId) : null
+  const selectedCharacter = activeTab === 'characters'
+    ? allCharacters.find(c => c.id === selectedId)
+    : null
+  const selectedKeyProp = activeTab === 'keyProps'
+    ? allKeyProps.find(p => p.id === selectedId)
+    : null
+  const selectedLocation = activeTab === 'locations'
+    ? allLocations.find(l => l.id === selectedId)
+    : null
 
   return (
     <div className="space-y-4">
@@ -333,7 +391,7 @@ export function VisualConceptTabs({
             )}
           >
             <User className="h-4 w-4 mr-2" />
-            캐릭터 ({characters.length})
+            캐릭터 ({allCharacters.length})
           </Button>
           <Button
             variant="ghost"
@@ -346,7 +404,7 @@ export function VisualConceptTabs({
             )}
           >
             <MapPin className="h-4 w-4 mr-2" />
-            장소 ({locations.length})
+            장소 ({allLocations.length})
           </Button>
           <Button
             variant="ghost"
@@ -359,18 +417,18 @@ export function VisualConceptTabs({
             )}
           >
             <Package className="h-4 w-4 mr-2" />
-            소품 ({keyProps.length})
+            소품 ({allKeyProps.length})
           </Button>
         </div>
       </div>
 
       {/* Character Tab Content */}
-      {activeTab === 'characters' && characters.length > 0 && (
+      {activeTab === 'characters' && allCharacters.length > 0 && (
         <>
           {/* Character Sub-tabs */}
           <div className="overflow-x-auto scrollbar-hide">
             <div className="flex gap-2 border-b border-white/10 pb-2 min-w-fit">
-              {characters.map((character) => (
+              {allCharacters.map((character) => (
                 <Button
                   key={character.id}
                   variant="ghost"
@@ -422,49 +480,95 @@ export function VisualConceptTabs({
                   </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-xs text-muted-foreground">역할</label>
-                    <Input
-                      value={selectedCharacter.role}
-                      onChange={(e) => handleUpdateCharacter(selectedCharacter.id, 'role', e.target.value)}
-                      placeholder="주인공, 조연 등"
-                      className="bg-background/50 border-white/10"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground">설명</label>
-                    <textarea
-                      value={selectedCharacter.description}
-                      onChange={(e) => handleUpdateCharacter(selectedCharacter.id, 'description', e.target.value)}
-                      placeholder="캐릭터 설명"
-                      className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      rows={3}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground">비주얼 프롬프트</label>
-                    <div className="relative mt-1">
-                      <textarea
-                        value={selectedCharacter.visualDescription}
-                        onChange={(e) => handleUpdateCharacter(selectedCharacter.id, 'visualDescription', e.target.value)}
-                        placeholder="A young man with silver hair..."
-                        className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        rows={4}
-                      />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleCopy(selectedCharacter.visualDescription, `char_visual_${selectedCharacter.id}`)}
-                        className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
-                      >
-                        {copiedId === `char_visual_${selectedCharacter.id}` ? (
-                          <Check className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
+                  {/* V8 Blocks 데이터 표시 */}
+                  {(selectedCharacter as any).blocks ? (
+                    <>
+                      {/* V8 프롬프트 표시 */}
+                      {library && (() => {
+                        try {
+                          // 임시 promptBlock 생성 (캐릭터 데이터만 있을 경우)
+                          const tempPromptBlock: PromptBlock = {
+                            base_character_id: selectedCharacter.id,
+                            base_location_id: '', // 빈 장소
+                            override: {}
+                          }
+                          const generatedPrompt = generateBlockPrompt(library as Library, tempPromptBlock)
+
+                          return (
+                            <div>
+                              <label className="text-xs text-muted-foreground mb-2 block">생성된 프롬프트</label>
+                              <div className="relative">
+                                <div className="bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono min-h-[300px] overflow-y-auto">
+                                  {generatedPrompt}
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleCopy(generatedPrompt, `char_prompt_${selectedCharacter.id}`)}
+                                  className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
+                                >
+                                  {copiedId === `char_prompt_${selectedCharacter.id}` ? (
+                                    <Check className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <Copy className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                          )
+                        } catch (e) {
+                          console.error('프롬프트 생성 실패:', e)
+                          return null
+                        }
+                      })()}
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <label className="text-xs text-muted-foreground">역할</label>
+                        <Input
+                          value={selectedCharacter.role}
+                          onChange={(e) => handleUpdateCharacter(selectedCharacter.id, 'role', e.target.value)}
+                          placeholder="주인공, 조연 등"
+                          className="bg-background/50 border-white/10"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground">설명</label>
+                        <textarea
+                          value={selectedCharacter.description}
+                          onChange={(e) => handleUpdateCharacter(selectedCharacter.id, 'description', e.target.value)}
+                          placeholder="캐릭터 설명"
+                          className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          rows={3}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground">비주얼 프롬프트</label>
+                        <div className="relative mt-1">
+                          <textarea
+                            value={selectedCharacter.visualDescription}
+                            onChange={(e) => handleUpdateCharacter(selectedCharacter.id, 'visualDescription', e.target.value)}
+                            placeholder="A young man with silver hair..."
+                            className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+                            rows={4}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCopy(selectedCharacter.visualDescription, `char_visual_${selectedCharacter.id}`)}
+                            className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
+                          >
+                            {copiedId === `char_visual_${selectedCharacter.id}` ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
@@ -502,11 +606,11 @@ export function VisualConceptTabs({
       )}
 
       {/* Locations Tab Content */}
-      {activeTab === 'locations' && locations.length > 0 && (
+      {activeTab === 'locations' && allLocations.length > 0 && (
         <>
           <div className="overflow-x-auto scrollbar-hide">
             <div className="flex gap-2 border-b border-white/10 pb-2 min-w-fit">
-              {locations.map((location) => (
+              {allLocations.map((location) => (
                 <Button
                   key={location.id}
                   variant="ghost"
@@ -519,7 +623,7 @@ export function VisualConceptTabs({
                   )}
                 >
                   <MapPin className="h-4 w-4 mr-2" />
-                  Scene {location.scene}
+                  {location.title || (location as any).name || `Scene ${location.scene}`}
                 </Button>
               ))}
             </div>
@@ -536,78 +640,74 @@ export function VisualConceptTabs({
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-xs text-muted-foreground">장소 프롬프트 (클릭하여 수정)</label>
-                    <div className="relative">
-                      <textarea
-                        value={selectedLocation.location}
-                        onChange={(e) => handleUpdateLocation(selectedLocation.id, 'location', e.target.value)}
-                        className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
-                        rows={4}
-                        placeholder="장소 프롬프트를 입력하세요..."
-                      />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleCopy(selectedLocation.location, `loc_${selectedLocation.id}`)}
-                        className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
-                      >
-                        {copiedId === `loc_${selectedLocation.id}` ? (
-                          <Check className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground">시간대 (클릭하여 수정)</label>
-                    <Input
-                      value={selectedLocation.timeOfDay}
-                      onChange={(e) => handleUpdateLocation(selectedLocation.id, 'timeOfDay', e.target.value)}
-                      placeholder="예: at night, during sunset..."
-                      className="bg-background/50 border-white/10"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground">분위기 (클릭하여 수정)</label>
-                    <Input
-                      value={selectedLocation.atmosphere}
-                      onChange={(e) => handleUpdateLocation(selectedLocation.id, 'atmosphere', e.target.value)}
-                      placeholder="예: chaotic, peaceful, mysterious..."
-                      className="bg-background/50 border-white/10"
-                    />
-                  </div>
+                  {/* V8 Blocks 데이터 표시 */}
+                  {(selectedLocation as any).blocks ? (
+                    <>
+                      {/* V8 프롬프트 표시 */}
+                      {library && (() => {
+                        try {
+                          // 임시 promptBlock 생성 (장소 데이터만 있을 경우)
+                          const tempPromptBlock: PromptBlock = {
+                            base_character_id: '', // 빈 캐릭터
+                            base_location_id: selectedLocation.id,
+                            override: {}
+                          }
+                          const generatedPrompt = generateBlockPrompt(library as Library, tempPromptBlock)
 
-                  {/* 전체 프롬프트 조합 */}
-                  <div>
-                    <label className="text-xs text-muted-foreground">전체 프롬프트 (장소 + 시간 + 분위기) - 클릭하여 수정</label>
-                    <div className="relative">
-                      <textarea
-                        value={fullPromptOverrides[selectedLocation.id] || `${selectedLocation.location}${selectedLocation.timeOfDay ? `, ${selectedLocation.timeOfDay}` : ''}${selectedLocation.atmosphere ? `, ${selectedLocation.atmosphere}` : ''}`}
-                        onChange={(e) => handleUpdateFullPrompt(selectedLocation.id, e.target.value)}
-                        className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
-                        rows={3}
-                        placeholder="전체 프롬프트를 입력하세요..."
-                      />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleCopy(
-                          fullPromptOverrides[selectedLocation.id] ||
-                          `${selectedLocation.location}${selectedLocation.timeOfDay ? `, ${selectedLocation.timeOfDay}` : ''}${selectedLocation.atmosphere ? `, ${selectedLocation.atmosphere}` : ''}`,
-                          `loc_full_${selectedLocation.id}`
-                        )}
-                        className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
-                      >
-                        {copiedId === `loc_full_${selectedLocation.id}` ? (
-                          <Check className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
+                          return (
+                            <div>
+                              <label className="text-xs text-muted-foreground mb-2 block">생성된 프롬프트</label>
+                              <div className="relative">
+                                <div className="bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono min-h-[300px] overflow-y-auto">
+                                  {generatedPrompt}
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleCopy(generatedPrompt, `loc_prompt_${selectedLocation.id}`)}
+                                  className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
+                                >
+                                  {copiedId === `loc_prompt_${selectedLocation.id}` ? (
+                                    <Check className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <Copy className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                          )
+                        } catch (e) {
+                          console.error('프롬프트 생성 실패:', e)
+                          return null
+                        }
+                      })()}
+                    </>
+                  ) : (
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-2 block">장소 프롬프트</label>
+                      <div className="relative">
+                        <div className="bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono min-h-[300px] overflow-y-auto">
+                          {fullPromptOverrides[selectedLocation.id] || `${selectedLocation.location}${selectedLocation.timeOfDay ? `, ${selectedLocation.timeOfDay}` : ''}${selectedLocation.atmosphere ? `, ${selectedLocation.atmosphere}` : ''}`}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCopy(
+                            fullPromptOverrides[selectedLocation.id] ||
+                            `${selectedLocation.location}${selectedLocation.timeOfDay ? `, ${selectedLocation.timeOfDay}` : ''}${selectedLocation.atmosphere ? `, ${selectedLocation.atmosphere}` : ''}`,
+                            `loc_prompt_legacy_${selectedLocation.id}`
+                          )}
+                          className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
+                        >
+                          {copiedId === `loc_prompt_legacy_${selectedLocation.id}` ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -645,11 +745,11 @@ export function VisualConceptTabs({
       )}
 
       {/* KeyProps Tab Content */}
-      {activeTab === 'keyProps' && keyProps.length > 0 && (
+      {activeTab === 'keyProps' && allKeyProps.length > 0 && (
         <>
           <div className="overflow-x-auto scrollbar-hide">
             <div className="flex gap-2 border-b border-white/10 pb-2 min-w-fit">
-              {keyProps.map((prop) => (
+              {allKeyProps.map((prop) => (
                 <Button
                   key={prop.id}
                   variant="ghost"
@@ -698,40 +798,88 @@ export function VisualConceptTabs({
                   </Button>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-xs text-muted-foreground">설명</label>
-                    <textarea
-                      value={selectedKeyProp.description}
-                      onChange={(e) => handleUpdateKeyProp(selectedKeyProp.id, 'description', e.target.value)}
-                      placeholder="소품 설명"
-                      className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      rows={3}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs text-muted-foreground">비주얼 프롬프트</label>
-                    <div className="relative mt-1">
-                      <textarea
-                        value={selectedKeyProp.visualDescription}
-                        onChange={(e) => handleUpdateKeyProp(selectedKeyProp.id, 'visualDescription', e.target.value)}
-                        placeholder="A glowing blue energy katana..."
-                        className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
-                        rows={4}
-                      />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleCopy(selectedKeyProp.visualDescription, `prop_visual_${selectedKeyProp.id}`)}
-                        className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
-                      >
-                        {copiedId === `prop_visual_${selectedKeyProp.id}` ? (
-                          <Check className="h-4 w-4 text-green-500" />
-                        ) : (
-                          <Copy className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
+                  {/* V8 Blocks 데이터 표시 */}
+                  {(selectedKeyProp as any).blocks ? (
+                    <>
+                      {/* V8 프롬프트 표시 (소품 blocks를 문자열로 조합) */}
+                      {(() => {
+                        try {
+                          const blocks = (selectedKeyProp as any).blocks
+                          // 소품 blocks를 문자열로 조합
+                          const propPrompt = Object.entries(blocks)
+                            .filter(([key]) => key.startsWith('prop_'))
+                            .map(([_, value]) => value)
+                            .filter(Boolean)
+                            .join(', ')
+
+                          if (!propPrompt) return null
+
+                          return (
+                            <div>
+                              <label className="text-xs text-muted-foreground mb-2 block">생성된 프롬프트</label>
+                              <div className="relative">
+                                <div className="bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono min-h-[300px] overflow-y-auto">
+                                  {propPrompt}
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleCopy(propPrompt, `prop_prompt_${selectedKeyProp.id}`)}
+                                  className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
+                                >
+                                  {copiedId === `prop_prompt_${selectedKeyProp.id}` ? (
+                                    <Check className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <Copy className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </div>
+                            </div>
+                          )
+                        } catch (e) {
+                          console.error('프롬프트 생성 실패:', e)
+                          return null
+                        }
+                      })()}
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <label className="text-xs text-muted-foreground">설명</label>
+                        <textarea
+                          value={selectedKeyProp.description}
+                          onChange={(e) => handleUpdateKeyProp(selectedKeyProp.id, 'description', e.target.value)}
+                          placeholder="소품 설명"
+                          className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          rows={3}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground">비주얼 프롬프트</label>
+                        <div className="relative mt-1">
+                          <textarea
+                            value={selectedKeyProp.visualDescription}
+                            onChange={(e) => handleUpdateKeyProp(selectedKeyProp.id, 'visualDescription', e.target.value)}
+                            placeholder="A glowing blue energy katana..."
+                            className="w-full bg-background/50 border border-white/10 rounded-lg px-3 py-2 pr-10 text-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+                            rows={4}
+                          />
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCopy(selectedKeyProp.visualDescription, `prop_visual_${selectedKeyProp.id}`)}
+                            className="absolute top-2 right-2 h-8 w-8 p-0 rounded-md hover:bg-white/10 active:bg-white/20 transition-colors"
+                          >
+                            {copiedId === `prop_visual_${selectedKeyProp.id}` ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
@@ -769,7 +917,7 @@ export function VisualConceptTabs({
       )}
 
       {/* Empty States */}
-      {activeTab === 'characters' && characters.length === 0 && (
+      {activeTab === 'characters' && allCharacters.length === 0 && (
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
           <User className="h-16 w-16 text-muted-foreground" />
           <p className="text-muted-foreground">등록된 캐릭터가 없습니다.</p>
@@ -780,7 +928,7 @@ export function VisualConceptTabs({
         </div>
       )}
 
-      {activeTab === 'locations' && locations.length === 0 && (
+      {activeTab === 'locations' && allLocations.length === 0 && (
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
           <MapPin className="h-16 w-16 text-muted-foreground" />
           <p className="text-muted-foreground">장소 정보가 없습니다.</p>
@@ -788,7 +936,7 @@ export function VisualConceptTabs({
         </div>
       )}
 
-      {activeTab === 'keyProps' && keyProps.length === 0 && (
+      {activeTab === 'keyProps' && allKeyProps.length === 0 && (
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4">
           <Package className="h-16 w-16 text-muted-foreground" />
           <p className="text-muted-foreground">등록된 소품이 없습니다.</p>

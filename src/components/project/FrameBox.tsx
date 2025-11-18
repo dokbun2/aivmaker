@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Copy, Check, Play, Circle, Square, Upload } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import type { ShotFrame, Library } from '@/types/schema'
+import { generateBlockPrompt, formatSemanticKey } from '@/lib/promptBuilder'
 
 interface PromptStructure {
   subject?: string
@@ -29,7 +31,7 @@ interface Motion {
   speed?: string
 }
 
-interface Frame {
+interface LegacyFrame {
   shotType?: string
   duration?: number
   description?: string
@@ -40,24 +42,36 @@ interface Frame {
   motion?: Motion
 }
 
+// Union type for both legacy and new format
+type Frame = LegacyFrame | ShotFrame
+
 interface FrameBoxProps {
   frame: Frame
   type: 'start' | 'middle' | 'end'
   sceneId: string
+  library?: Library  // V8 스키마용 라이브러리
 }
 
-export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
+export function FrameBox({ frame, type, sceneId, library }: FrameBoxProps) {
   const cacheKey = `frame_image_${sceneId}_${type}`
   const promptCacheKey = `frame_prompt_${sceneId}_${type}`
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // V8 promptBlock이 있는지 확인
+  const isV8Format = (f: Frame): f is ShotFrame => {
+    return 'promptBlock' in f && f.promptBlock !== undefined
+  }
+
   // 캐시에서 이미지 URL 불러오기
   const getCachedUrl = () => {
     const cached = localStorage.getItem(cacheKey)
+    if (isV8Format(frame)) {
+      return cached || ''
+    }
     return cached || frame.imageUrl || ''
   }
 
-  // promptStructure를 조합하여 프롬프트 생성
+  // promptStructure를 조합하여 프롬프트 생성 (레거시)
   const combinePromptStructure = (structure: PromptStructure): string => {
     const parts: string[] = []
 
@@ -88,12 +102,18 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
     const cached = localStorage.getItem(promptCacheKey)
     if (cached) return cached
 
-    // 캐시가 없으면 promptStructure에서 생성
-    if (frame.promptStructure) {
+    // V8 포맷: promptBlock에서 프롬프트 생성
+    if (isV8Format(frame) && library) {
+      return generateBlockPrompt(library, frame.promptBlock)
+    }
+
+    // 레거시: promptStructure에서 생성
+    if (!isV8Format(frame) && frame.promptStructure) {
       return combinePromptStructure(frame.promptStructure)
     }
 
-    return frame.prompt || ''
+    // 폴백: prompt 필드 사용
+    return !isV8Format(frame) ? (frame.prompt || '') : ''
   }
 
   const [copied, setCopied] = useState(false)
@@ -235,8 +255,66 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
         <p className="text-sm text-muted-foreground">{frame.description}</p>
       )}
 
-      {/* Prompt Structure Toggle */}
-      {frame.promptStructure && (
+      {/* Prompt Structure Toggle - V8 Format */}
+      {isV8Format(frame) && frame.promptBlock && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowPromptStructure(!showPromptStructure)}
+          className="w-full justify-start text-xs text-muted-foreground hover:text-foreground"
+        >
+          {showPromptStructure ? '▼' : '▶'} Prompt Block (V8)
+        </Button>
+      )}
+
+      {/* V8 Prompt Block Details */}
+      {showPromptStructure && isV8Format(frame) && frame.promptBlock && (
+        <div className="p-3 rounded-lg bg-background/50 border border-white/10 space-y-3 text-xs">
+          {/* Base References */}
+          <div className="space-y-1">
+            <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Base</div>
+            {frame.promptBlock.base_character_id && (
+              <div className="flex gap-2 items-start">
+                <span className="text-muted-foreground min-w-[100px]">Character:</span>
+                <span className="text-foreground font-mono text-[11px] bg-blue-500/10 px-2 py-0.5 rounded">
+                  {frame.promptBlock.base_character_id}
+                </span>
+              </div>
+            )}
+            {frame.promptBlock.base_location_id && (
+              <div className="flex gap-2 items-start">
+                <span className="text-muted-foreground min-w-[100px]">Location:</span>
+                <span className="text-foreground font-mono text-[11px] bg-green-500/10 px-2 py-0.5 rounded">
+                  {frame.promptBlock.base_location_id}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Override Values */}
+          {frame.promptBlock.override && Object.keys(frame.promptBlock.override).length > 0 && (
+            <>
+              <div className="border-t border-white/10"></div>
+              <div className="space-y-1">
+                <div className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Override</div>
+                {Object.entries(frame.promptBlock.override).map(([key, value]) => (
+                  value && (
+                    <div key={key} className="flex gap-2 items-start">
+                      <span className="text-muted-foreground min-w-[100px]">
+                        {formatSemanticKey(key)}:
+                      </span>
+                      <span className="text-foreground flex-1">{value}</span>
+                    </div>
+                  )
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Legacy Prompt Structure Toggle */}
+      {!isV8Format(frame) && frame.promptStructure && (
         <Button
           variant="ghost"
           size="sm"
@@ -247,8 +325,8 @@ export function FrameBox({ frame, type, sceneId }: FrameBoxProps) {
         </Button>
       )}
 
-      {/* Prompt Structure Details */}
-      {showPromptStructure && frame.promptStructure && (
+      {/* Legacy Prompt Structure Details */}
+      {showPromptStructure && !isV8Format(frame) && frame.promptStructure && (
         <div className="p-3 rounded-lg bg-background/50 border border-white/10 space-y-1 text-xs">
           {/* 새로운 필드들을 먼저 표시 */}
           {['subject', 'composition', 'style', 'details', 'parameters'].map((key) => {
