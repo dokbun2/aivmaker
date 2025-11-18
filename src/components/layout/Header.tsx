@@ -152,7 +152,7 @@ export function Header({ onMenuClick, onUpload, onReset, onBackup, scenario, scr
               <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
 
-            <a href="/" className="flex items-center gap-2 sm:gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+            <a href="https://promptchat-zeta.vercel.app/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 sm:gap-3 cursor-pointer hover:opacity-80 transition-opacity">
               <img src="/logo.png" alt="Logo" className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg" />
               <div>
                 <h1 className="text-sm sm:text-base md:text-lg font-semibold">AI툴비</h1>
