@@ -183,16 +183,6 @@ export function Sidebar({ isOpen, onClose, onNanoStudioToggle, showNanoStudio, o
                   <div className="pl-6 space-y-1">
                     <Button
                       variant="ghost"
-                      className="w-full justify-start rounded-full hover:bg-white/10 text-foreground text-sm"
-                      onClick={() => {
-                        window.open('https://img-fx.com/ai-image-upscaler', '_blank')
-                        onClose()
-                      }}
-                    >
-                      업스케일러
-                    </Button>
-                    <Button
-                      variant="ghost"
                       className={cn(
                         "w-full justify-start rounded-full text-sm transition-all",
                         showMultiDownloader
