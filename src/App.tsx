@@ -603,8 +603,20 @@ function App() {
             <PromptGenerator />
           </div>
         ) : (
-          <div className="p-2 lg:p-4">
-            <ProjectManager projectData={projectData} />
+          <div className="flex h-[calc(100vh-4rem)] gap-2 lg:gap-4 p-2 lg:p-4">
+            {/* 왼쪽: ProjectManager */}
+            <div className="flex-1 overflow-y-auto">
+              <ProjectManager projectData={projectData} />
+            </div>
+            {/* 오른쪽: 툴비봇 iframe */}
+            <div className="flex-1 border border-white/10 rounded-lg overflow-hidden">
+              <iframe
+                src="https://promptchat-zeta.vercel.app/"
+                className="w-full h-full border-0"
+                title="툴비봇"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
+            </div>
           </div>
         )}
       </main>
