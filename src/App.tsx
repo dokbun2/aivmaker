@@ -576,7 +576,7 @@ function App() {
         ) : showNanoStudio ? (
           <div className="w-full h-[calc(100vh-4rem)] overflow-hidden">
             <iframe
-              src="https://service-252213558759.us-west1.run.app"
+              src="https://tbstudionew.vercel.app/"
               className="w-full h-full"
               title="Nano Studio"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
