@@ -253,6 +253,24 @@ function App() {
             })
 
             console.log('캐시 데이터 복원 완료:', Object.keys(json.cachedData).length, '개 항목')
+          }
+          // properties.projectData 형식 (CF영상 JSON 스키마)
+          else if (json.properties?.projectData) {
+            console.log('CF영상 JSON 스키마 감지 - properties.projectData 형식')
+
+            const projectData = json.properties.projectData
+            // shots → frames 변환
+            const convertedData = convertShotsToFrames(projectData)
+            setProjectData(convertedData)
+
+            // cachedData가 있으면 복원
+            if (json.properties.cachedData) {
+              Object.entries(json.properties.cachedData).forEach(([key, value]) => {
+                localStorage.setItem(key, value as string)
+              })
+            }
+
+            console.log('CF영상 데이터 로드 완료')
           } else {
             // 구 형식 (프로젝트 데이터만)
             console.log('기본 프로젝트 데이터 로드')
@@ -484,12 +502,12 @@ function App() {
             />
             <div className="absolute inset-0 flex items-center justify-center md:mt-80 mt-40">
               <div className="relative w-[90vw] max-w-[600px] h-[60vw] max-h-[300px]">
-                {/* START 버튼 (상단 중앙) */}
+                {/* START 버튼 (상단 좌측) */}
                 <a
                   href="https://gemini.google.com/gem/1zximT5wRr3zL-y3D_4HKAL909Bzwy8I0?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-1/2 -translate-x-1/2 top-0 w-[28%] h-[45%]"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[22%] top-0 w-[28%] h-[45%]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
                     <polygon
@@ -503,12 +521,31 @@ function App() {
                   <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-base sm:text-xl md:text-2xl pointer-events-none">START</span>
                 </a>
 
+                {/* 새 버튼 (상단 우측) */}
+                <a
+                  href="https://gemini.google.com/gem/1GP-VmJXjQSl3y9FHfLb6X-WIHKss48_4?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 right-[22%] top-0 w-[28%] h-[45%]"
+                >
+                  <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
+                    <polygon
+                      points="80,0 160,34.5 160,103.5 80,138 0,103.5 0,34.5"
+                      fill="rgba(127, 29, 29, 0.85)"
+                      stroke="gray"
+                      strokeWidth="2"
+                      className="transition-all duration-300"
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-base sm:text-xl md:text-2xl pointer-events-none">Tools</span>
+                </a>
+
                 {/* 이미지 생성 버튼 (하단 왼쪽) */}
                 <a
                   href="https://gemini.google.com/gem/17YwS4g-YuAFYoTyfnO78064pVVYS-lbY?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[22%] top-[37%] w-[28%] h-[45%]"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[10%] top-[37%] w-[28%] h-[45%]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
                     <polygon
@@ -527,7 +564,7 @@ function App() {
                   href="https://gemini.google.com/gem/1GMqeS_7sP_v1RUx5OFcSU0vRvXKYZcrf?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[64%] -translate-x-1/2 top-[37%] w-[28%] h-[45%]"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[54%] -translate-x-1/2 top-[37%] w-[28%] h-[45%]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
                     <polygon
@@ -546,7 +583,7 @@ function App() {
                   href="https://gemini.google.com/gem/1s8f2dOr9ZGwCBrOWwbeW-8kZ3_qK-AqP?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[78%] top-[37%] w-[28%] h-[45%]"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[66%] top-[37%] w-[28%] h-[45%]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
                     <polygon

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, Image as ImageIcon, Video } from 'lucide-react'
+import { ChevronDown, Image as ImageIcon, Video, FileText } from 'lucide-react'
 import { SceneCard } from './SceneCard'
 import { EmptyState } from './EmptyState'
 import { Button } from '@/components/ui/button'
@@ -52,6 +52,7 @@ interface Scene {
   id?: string
   title?: string
   description?: string
+  narration?: string
   duration?: number
   setting?: Setting
   charactersInScene?: string[]
@@ -71,6 +72,11 @@ interface Scene {
   }
 }
 
+interface Scenario {
+  fullScript?: string
+  summary?: string
+}
+
 interface ProjectData {
   project: {
     title: string
@@ -79,6 +85,7 @@ interface ProjectData {
     totalDuration: string | number
     description?: string
   }
+  scenario?: string | Scenario
   scenes: Scene[]
   definitions?: {
     library?: {
@@ -96,12 +103,22 @@ interface ProjectManagerProps {
 export function ProjectManager({ projectData }: ProjectManagerProps) {
   const [selectedSceneIndex, setSelectedSceneIndex] = useState(0)
   const [downloading, setDownloading] = useState(false)
+  const [showFullScript, setShowFullScript] = useState(true)
 
   if (!projectData) {
     return <EmptyState />
   }
 
   const currentScene = projectData.scenes[selectedSceneIndex]
+
+  // fullScript 추출
+  const getFullScript = (): string => {
+    if (!projectData.scenario) return ''
+    if (typeof projectData.scenario === 'string') return projectData.scenario
+    return projectData.scenario.fullScript || projectData.scenario.summary || ''
+  }
+
+  const fullScript = getFullScript()
 
   // localStorage에서 모든 이미지/비디오 URL 수집
   const collectMediaUrls = (type: 'image' | 'video') => {
@@ -243,6 +260,33 @@ export function ProjectManager({ projectData }: ProjectManagerProps) {
 
   return (
     <div className="space-y-4">
+      {/* 풀스크립트 섹션 - 데이터가 있을 때만 표시 */}
+      {fullScript && (
+        <div className="backdrop-blur-xl bg-card/50 border border-white/10 rounded-2xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-yellow-400" />
+              <h3 className="font-medium text-yellow-400">풀스크립트</h3>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowFullScript(!showFullScript)}
+              className="text-xs"
+            >
+              {showFullScript ? '접기' : '펼치기'}
+            </Button>
+          </div>
+          {showFullScript && (
+            <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+              <p className="text-sm text-yellow-100 whitespace-pre-wrap leading-relaxed">
+                {fullScript}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Project Info & Scene Selector - 2 Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Project Info & Description Combined */}

@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
-import { ChevronLeft, ChevronRight, Copy, Check, Edit2, X, Save } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Copy, Check, Edit2, X, Save, Mic } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { generateBlockPrompt } from '@/lib/promptBuilder'
 
@@ -56,6 +56,7 @@ interface Scene {
   id?: string
   title?: string
   description?: string
+  narration?: string
   duration?: number
   setting?: Setting
   charactersInScene?: string[]
@@ -99,17 +100,20 @@ function FramePage({
   frame,
   type,
   sceneId,
-  library
+  library,
+  narration
 }: {
   frame: Frame
   type: FrameType
   sceneId: string
   library?: any
+  narration?: string
 }) {
   const [isEditingPrompt, setIsEditingPrompt] = useState(false)
   const [editedPrompt, setEditedPrompt] = useState('')
   const [copied, setCopied] = useState(false)
   const [copiedMotion, setCopiedMotion] = useState(false)
+  const [copiedNarration, setCopiedNarration] = useState(false)
   const [imageUrl, setImageUrl] = useState(() => {
     const cached = localStorage.getItem(`frame_image_${sceneId}_${type}`)
     return cached || frame.imageUrl || ''
@@ -421,6 +425,39 @@ function FramePage({
             </div>
           </div>
         )}
+
+        {/* 나래이션 - 모션 아래에 표시 (데이터가 있을 때만) */}
+        {narration && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Mic className="h-4 w-4 text-orange-400" />
+                <h4 className="text-sm font-medium text-orange-400">나래이션</h4>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(narration)
+                  setCopiedNarration(true)
+                  setTimeout(() => setCopiedNarration(false), 2000)
+                }}
+                className="h-8 px-2"
+              >
+                {copiedNarration ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/30">
+              <p className="text-sm text-orange-100 leading-relaxed">
+                {narration}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 하단: 미디어 섹션 */}
@@ -577,6 +614,7 @@ export function SceneCard({ scene, index, library }: SceneCardProps) {
               type={currentFrame}
               sceneId={sceneIdValue}
               library={library}
+              narration={scene.narration}
             />
           )}
         </div>
