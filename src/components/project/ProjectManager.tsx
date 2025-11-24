@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, Image as ImageIcon, Video, FileText } from 'lucide-react'
+import { ChevronDown, Image as ImageIcon, Video, FileText, Copy, Check } from 'lucide-react'
 import { SceneCard } from './SceneCard'
 import { EmptyState } from './EmptyState'
 import { Button } from '@/components/ui/button'
@@ -104,6 +104,7 @@ export function ProjectManager({ projectData }: ProjectManagerProps) {
   const [selectedSceneIndex, setSelectedSceneIndex] = useState(0)
   const [downloading, setDownloading] = useState(false)
   const [showFullScript, setShowFullScript] = useState(true)
+  const [copiedFullScript, setCopiedFullScript] = useState(false)
 
   if (!projectData) {
     return <EmptyState />
@@ -268,14 +269,32 @@ export function ProjectManager({ projectData }: ProjectManagerProps) {
               <FileText className="h-5 w-5 text-yellow-400" />
               <h3 className="font-medium text-yellow-400">풀스크립트</h3>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowFullScript(!showFullScript)}
-              className="text-xs"
-            >
-              {showFullScript ? '접기' : '펼치기'}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(fullScript)
+                  setCopiedFullScript(true)
+                  setTimeout(() => setCopiedFullScript(false), 2000)
+                }}
+                className="h-8 px-2"
+              >
+                {copiedFullScript ? (
+                  <Check className="h-4 w-4 text-green-500" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFullScript(!showFullScript)}
+                className="text-xs"
+              >
+                {showFullScript ? '접기' : '펼치기'}
+              </Button>
+            </div>
           </div>
           {showFullScript && (
             <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
