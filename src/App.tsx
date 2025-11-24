@@ -518,7 +518,7 @@ function App() {
                       className="transition-all duration-300"
                     />
                   </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-base sm:text-xl md:text-2xl pointer-events-none">START</span>
+                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-base sm:text-xl md:text-2xl pointer-events-none">영상제작</span>
                 </a>
 
                 {/* 새 버튼 (상단 우측) */}
@@ -537,7 +537,7 @@ function App() {
                       className="transition-all duration-300"
                     />
                   </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-base sm:text-xl md:text-2xl pointer-events-none">Tools</span>
+                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-base sm:text-xl md:text-2xl pointer-events-none">CF제작</span>
                 </a>
 
                 {/* 이미지 생성 버튼 (하단 왼쪽) */}
@@ -545,7 +545,7 @@ function App() {
                   href="https://gemini.google.com/gem/17YwS4g-YuAFYoTyfnO78064pVVYS-lbY?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[10%] top-[37%] w-[28%] h-[45%]"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[8%] top-[37%] w-[28%] h-[45%]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
                     <polygon
@@ -564,7 +564,7 @@ function App() {
                   href="https://gemini.google.com/gem/1GMqeS_7sP_v1RUx5OFcSU0vRvXKYZcrf?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[54%] -translate-x-1/2 top-[37%] w-[28%] h-[45%]"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[50%] -translate-x-1/2 top-[37%] w-[28%] h-[45%]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
                     <polygon
@@ -583,7 +583,7 @@ function App() {
                   href="https://gemini.google.com/gem/1s8f2dOr9ZGwCBrOWwbeW-8kZ3_qK-AqP?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[66%] top-[37%] w-[28%] h-[45%]"
+                  className="absolute transition-all duration-300 hover:scale-105 active:scale-95 left-[64%] top-[37%] w-[28%] h-[45%]"
                 >
                   <svg width="100%" height="100%" viewBox="0 0 160 138" className="block" preserveAspectRatio="xMidYMid meet">
                     <polygon
